@@ -20,3 +20,6 @@ def search(max_range: int, search_start: int = SEARCH_START) -> int:
     raise ValueError(
         "No witnesses found. "
         "Are you sure trying to disprove RH is wise?")
+
+def best_witness(max_range: int, search_start: int = SEARCH_START) -> int:
+    return max(range(search_start, max_range), key=witness_value)
