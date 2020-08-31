@@ -1,6 +1,7 @@
 '''Compute the sum of divisors of a number.'''
 
 def divisor_sum(n: int) -> int:
+    '''Compute the sum of divisors of a positive integer.'''
     if n <= 0:
         raise ValueError("Non-positive numbers are not supported.")
 

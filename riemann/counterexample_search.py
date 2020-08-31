@@ -9,6 +9,7 @@ def witness_value(n: int) -> float:
 
 
 def search(max_range: int, search_start:int = 5041) -> int:
+    '''Search for a counterexample to the Riemann Hypothesis.'''
     for n in range(search_start, max_range + 1):
         if witness_value(n) > 1.782:
             return n
