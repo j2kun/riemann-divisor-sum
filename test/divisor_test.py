@@ -24,9 +24,6 @@ def test_illegal_input_0():
     with pytest.raises(ValueError):
         divisor_sum(0)
 
-def test_illegal_input_0():
-    with pytest.raises(ValueError):
-        divisor_sum(0)
 def test_illegal_input_negative():
     with pytest.raises(ValueError):
         divisor_sum(-5)
