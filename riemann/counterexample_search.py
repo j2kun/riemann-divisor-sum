@@ -22,4 +22,5 @@ def search(max_range: int, search_start: int = SEARCH_START) -> int:
         "Are you sure trying to disprove RH is wise?")
 
 def best_witness(max_range: int, search_start: int = SEARCH_START) -> int:
+    [divisor_sum(i) for i in range(1, max_range)]
     return max(range(search_start, max_range), key=witness_value)
