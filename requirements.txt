@@ -1,6 +1,9 @@
 attrs==20.1.0
 iniconfig==1.0.1
+llvmlite==0.34.0
 more-itertools==8.5.0
+numba==0.51.2
+numpy==1.19.1
 packaging==20.4
 pluggy==0.13.1
 py==1.9.0
