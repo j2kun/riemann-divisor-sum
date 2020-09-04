@@ -1,6 +1,5 @@
 '''A simple in-memory divisor database.'''
 from dataclasses import dataclass
-from typing import Dict
 from typing import List
 
 from riemann.database import DivisorDb
