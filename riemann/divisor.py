@@ -20,3 +20,9 @@ def divisor_sum(n: int) -> int:
         i += 1
 
     return the_sum
+
+
+@njit
+def witness_value(n: int) -> float:
+    denominator = n * math.log(math.log(n))
+    return divisor_sum(n) / denominator
