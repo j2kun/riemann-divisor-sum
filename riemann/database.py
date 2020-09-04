@@ -6,14 +6,14 @@ from dataclasses import dataclass
 from typing import List
 
 
-@dataclass
+@dataclass(frozen=True)
 class RiemannDivisorSum:
     n: int
     divisor_sum: int
     witness_value: float
 
 
-@dataclass
+@dataclass(frozen=True)
 class SummaryStats:
     largest_computed_n: RiemannDivisorSum
     largest_witness_value: RiemannDivisorSum
