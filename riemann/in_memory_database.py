@@ -1,5 +1,4 @@
 '''A simple in-memory divisor database.'''
-from dataclasses import dataclass
 from typing import List
 
 from riemann.database import DivisorDb
@@ -7,7 +6,6 @@ from riemann.database import RiemannDivisorSum
 from riemann.database import SummaryStats
 
 
-@dataclass
 class InMemoryDivisorDb(DivisorDb):
     def __init__(self):
         self.data = dict()
