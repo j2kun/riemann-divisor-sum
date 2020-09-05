@@ -10,7 +10,7 @@ def populate_db(db: DivisorDb, batch_size: int = 100000) -> None:
 
     Write the computed divisor sums to the database after each batch.
     '''
-    starting_n = (db.summarize().largest_computed_n or 5040) + 1
+    starting_n = (db.summarize().largest_computed_n.n or 5040) + 1
     while True:
         ending_n = starting_n + batch_size
         start = time.time()
