@@ -2,3 +2,8 @@ venv
 __pycache__
 *.sqlite3
 *.sqlite3-journal
+
+# Ignore files cached by Hypothesis...
+.hypothesis/*
+# except for the examples directory
+!.hypothesis/examples/
