@@ -1,7 +1,7 @@
-from riemann.database import RiemannDivisorSum
 from riemann.divisor import compute_riemann_divisor_sums
 from riemann.divisor import divisor_sum
 from riemann.divisor import witness_value
+from riemann.types import RiemannDivisorSum
 import pytest
 
 # sigma(n), starting at n=1

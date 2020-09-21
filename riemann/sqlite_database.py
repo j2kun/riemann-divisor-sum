@@ -1,7 +1,7 @@
 from dataclasses import asdict
 from riemann.database import DivisorDb
-from riemann.database import RiemannDivisorSum
-from riemann.database import SummaryStats
+from riemann.types import RiemannDivisorSum
+from riemann.types import SummaryStats
 from typing import List
 import sqlite3
 

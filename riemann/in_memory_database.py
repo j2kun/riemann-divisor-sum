@@ -2,8 +2,8 @@
 from typing import List
 
 from riemann.database import DivisorDb
-from riemann.database import RiemannDivisorSum
-from riemann.database import SummaryStats
+from riemann.types import RiemannDivisorSum
+from riemann.types import SummaryStats
 
 
 class InMemoryDivisorDb(DivisorDb):

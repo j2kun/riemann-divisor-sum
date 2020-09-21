@@ -1,6 +1,6 @@
 '''Compute the sum of divisors of a number.'''
 from numba import njit
-from riemann.database import RiemannDivisorSum
+from riemann.types import RiemannDivisorSum
 from typing import List
 import math
 
