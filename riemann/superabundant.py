@@ -45,8 +45,9 @@ def partitions_of_n(n: int) -> List[Partition]:
 
 
 @njit
-def partition_to_prime_factorization(partition: Partition) -> PrimeFactorization:
-    return [(primes[i], exp) for (i, exp) in partition]
+def partition_to_prime_factorization(
+        partition: Partition) -> PrimeFactorization:
+    return [(primes[i], exp) for (i, exp) in enumerate(partition)]
 
 
 @njit
@@ -63,10 +64,10 @@ def prime_factor_divisor_sum(prime_factors: PrimeFactorization) -> int:
     return divisor_sum
 
 
-def compute_riemann_divisor_sum(factorization: PrimeFactorization) -> RiemannDivisorSum:
+def compute_riemann_divisor_sum(
+        factorization: PrimeFactorization) -> RiemannDivisorSum:
     '''Compute a divisor sum.'''
-    n = reduce(lambda x, y: x * y, (p**a for (p, a) in prime_factorization))
-    ds = prime_factor_divisor_sum(fac)
+    n = reduce(lambda x, y: x * y, (p**a for (p, a) in factorization))
+    ds = prime_factor_divisor_sum(factorization)
     wv = ds / (n * math.log(math.log(n)))
     return RiemannDivisorSum(n=n, divisor_sum=ds, witness_value=wv)
-
