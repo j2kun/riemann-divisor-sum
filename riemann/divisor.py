@@ -26,20 +26,6 @@ def divisor_sum(n: int) -> int:
 
 
 @njit
-def prime_factor_divisor_sum(prime_factors: List[Tuple[int]]) -> int:
-    '''Compute the sum of divisors of a positive integer
-    expressed in its prime factorization.'''
-    if not prime_factors:
-        return 1
-
-    divisor_sum = 1
-    for (prime, exponent) in prime_factors:
-        divisor_sum *= int((prime ** (exponent + 1) - 1) / (prime - 1))
-
-    return divisor_sum
-
-
-@njit
 def witness_value(n: int, precomputed_divisor_sum=None) -> float:
     denominator = n * math.log(math.log(n))
     ds = precomputed_divisor_sum or divisor_sum(n)

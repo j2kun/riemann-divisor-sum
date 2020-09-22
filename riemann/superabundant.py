@@ -1,16 +1,19 @@
-from dataclasses import dataclass
+from functools import reduce
+from numba import jit
 from numba import njit
-from typing import Dict
+from riemann.primes import primes
+from riemann.types import RiemannDivisorSum
 from typing import List
+from typing import Tuple
+import math
 
 
-@dataclass(frozen=True)
-class PossiblySuperabundantNumber:
-    prime_factors: Dict[int, int]
+PrimeFactorization = List[Tuple[int, int]]
+Partition = List[int]
 
 
 @njit
-def partitions_of_n(n: int) -> List[List[int]]:
+def partitions_of_n(n: int) -> List[Partition]:
     '''Compute all partitions of an integer n.'''
     p = [0] * n
     k = 0
@@ -39,3 +42,31 @@ def partitions_of_n(n: int) -> List[List[int]]:
         k += 1
 
     return output
+
+
+@njit
+def partition_to_prime_factorization(partition: Partition) -> PrimeFactorization:
+    return [(primes[i], exp) for (i, exp) in partition]
+
+
+@njit
+def prime_factor_divisor_sum(prime_factors: PrimeFactorization) -> int:
+    '''Compute the sum of divisors of a positive integer
+    expressed in its prime factorization.'''
+    if not prime_factors:
+        return 1
+
+    divisor_sum = 1
+    for (prime, exponent) in prime_factors:
+        divisor_sum *= int((prime ** (exponent + 1) - 1) / (prime - 1))
+
+    return divisor_sum
+
+
+def compute_riemann_divisor_sum(factorization: PrimeFactorization) -> RiemannDivisorSum:
+    '''Compute a divisor sum.'''
+    n = reduce(lambda x, y: x * y, (p**a for (p, a) in prime_factorization))
+    ds = prime_factor_divisor_sum(fac)
+    wv = ds / (n * math.log(math.log(n)))
+    return RiemannDivisorSum(n=n, divisor_sum=ds, witness_value=wv)
+
