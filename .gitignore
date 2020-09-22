@@ -7,3 +7,6 @@ __pycache__
 .hypothesis/*
 # except for the examples directory
 !.hypothesis/examples/
+
+.coverage
+cov_*
