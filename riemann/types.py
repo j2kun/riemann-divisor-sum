@@ -1,4 +1,9 @@
 from dataclasses import dataclass
+from typing import List
+from typing import Tuple
+
+PrimeFactorization = List[Tuple[int, int]]
+Partition = List[int]
 
 
 @dataclass(frozen=True)
@@ -17,4 +22,3 @@ class RiemannDivisorSum:
 class SummaryStats:
     largest_computed_n: RiemannDivisorSum
     largest_witness_value: RiemannDivisorSum
-

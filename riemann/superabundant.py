@@ -2,14 +2,11 @@ from functools import reduce
 from numba import jit
 from numba import njit
 from riemann.primes import primes
+from riemann.types import Partition
+from riemann.types import PrimeFactorization
 from riemann.types import RiemannDivisorSum
 from typing import List
-from typing import Tuple
 import math
-
-
-PrimeFactorization = List[Tuple[int, int]]
-Partition = List[int]
 
 
 @njit
@@ -59,7 +56,7 @@ def prime_factor_divisor_sum(prime_factors: PrimeFactorization) -> int:
 
     divisor_sum = 1
     for (prime, exponent) in prime_factors:
-        divisor_sum *= int((prime ** (exponent + 1) - 1) / (prime - 1))
+        divisor_sum *= int((prime**(exponent + 1) - 1) / (prime - 1))
 
     return divisor_sum
 
