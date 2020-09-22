@@ -1,8 +1,9 @@
 '''A simple cli to populate the database.'''
-import time
 from riemann.database import DivisorDb
 from riemann.divisor import compute_riemann_divisor_sums
+from riemann.search_strategy import ExhaustiveSearchStrategy
 from riemann.sqlite_database import SqliteDivisorDb
+import time
 
 
 def populate_db(db: DivisorDb, batch_size: int = 250000) -> None:
@@ -11,13 +12,13 @@ def populate_db(db: DivisorDb, batch_size: int = 250000) -> None:
     Write the computed divisor sums to the database after each batch.
     '''
     starting_n = (db.summarize().largest_computed_n.n or 5040) + 1
+    search_strategy = ExhaustiveSearchStrategy().starting_from(starting_n)
+
     while True:
-        ending_n = starting_n + batch_size
         start = time.time()
-        db.upsert(compute_riemann_divisor_sums(starting_n, ending_n))
+        db.upsert(search_strategy.next_batch(batch_size))
         end = time.time()
         print(f"Computed [{starting_n}, {ending_n}] in {end-start} seconds")
-        starting_n = ending_n + 1
 
 
 if __name__ == "__main__":
