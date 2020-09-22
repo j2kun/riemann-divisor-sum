@@ -16,7 +16,7 @@ class SqliteDivisorDb(DivisorDb):
     def initialize_schema(self):
         cursor = self.connection.cursor()
         cursor.execute('''
-        CREATE TABLE RiemannDivisorSums (
+        CREATE TABLE IF NOT EXISTS RiemannDivisorSums (
             n UNSIGNED BIG INT CONSTRAINT divisor_sum_pk PRIMARY KEY,
             divisor_sum UNSIGNED BIG INT,
             witness_value REAL
