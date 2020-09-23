@@ -1,6 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
+from datetime import datetime
 from typing import List
 from typing import Tuple
 
@@ -59,3 +60,12 @@ def deserialize_search_state(search_state_type: str,
             level=int(level), index_in_level=int(index_in_level))
     else:
         raise ValueError(f"Unknown search_state_type {search_state_type}")
+
+
+@dataclass(frozen=True)
+class SearchMetadata:
+    start_time: datetime
+    end_time: datetime
+    search_state_type: str
+    starting_search_state: SearchState
+    ending_search_state: SearchState
