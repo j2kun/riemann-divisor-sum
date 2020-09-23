@@ -7,12 +7,12 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from riemann import divisor
 from riemann import superabundant
-from riemann.types import SearchState
 from riemann.superabundant import partition_to_prime_factorization
 from riemann.superabundant import partitions_of_n
+from riemann.types import ExhaustiveSearchIndex
+from riemann.types import SearchState
 from riemann.types import SuperabundantEnumerationIndex
 from typing import List
-
 
 
 class SearchStrategy(ABC):
@@ -32,17 +32,31 @@ class SearchStrategy(ABC):
         pass
 
 
+def search_strategy_by_name(strategy_name):
+    lookup = {
+        cls.__name__: cls
+        for cls in [ExhaustiveSearchStrategy, SuperabundantSearchStrategy]
+    }
+    if strategy_name not in lookup:
+        raise ValueError(f"Unknown strategy name {strategy_name}, "
+                         f"should be one of {list(lookup.keys())}")
+
+    return lookup[strategy_name]
+
+
 class ExhaustiveSearchStrategy(SearchStrategy):
     '''A search strategy that tries every positive integer starting from 5041.'''
     def __init__(self):
         self.search_index = 5041
 
-    def starting_from(self, search_state: int) -> ExhaustiveSearchStrategy:
-        self.search_index = search_state
+    def starting_from(
+            self,
+            search_state: ExhaustiveSearchIndex) -> ExhaustiveSearchStrategy:
+        self.search_index = search_state.n
         return self
 
-    def search_state(self) -> int:
-        return self.search_index
+    def search_state(self) -> ExhaustiveSearchIndex:
+        return ExhaustiveSearchIndex(n=self.search_index)
 
     def next_batch(self, batch_size: int) -> List[RiemannDivisorSum]:
         ending_n = self.search_index + batch_size - 1
