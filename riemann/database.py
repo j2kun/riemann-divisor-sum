@@ -9,16 +9,16 @@ from typing import List
 
 class DivisorDb(ABC):
     @abstractmethod
-    def load() -> List[RiemannDivisorSum]:
+    def load(self) -> List[RiemannDivisorSum]:
         '''Load the entire database.'''
         pass
 
     @abstractmethod
-    def upsert(data: List[RiemannDivisorSum]) -> None:
+    def upsert(self, data: List[RiemannDivisorSum]) -> None:
         '''Insert or update the given list of data points.'''
         pass
 
     @abstractmethod
-    def summarize() -> SummaryStats:
+    def summarize(self) -> SummaryStats:
         '''Summarize the contents of the database.'''
         pass
