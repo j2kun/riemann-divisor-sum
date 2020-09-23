@@ -5,14 +5,14 @@ from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from riemann import superabundant
 from riemann import divisor
+from riemann import superabundant
+from riemann.types import SearchState
 from riemann.superabundant import partition_to_prime_factorization
 from riemann.superabundant import partitions_of_n
+from riemann.types import SuperabundantEnumerationIndex
 from typing import List
-from typing import TypeVar
 
-SearchState = TypeVar('SearchState')
 
 
 class SearchStrategy(ABC):
@@ -50,12 +50,6 @@ class ExhaustiveSearchStrategy(SearchStrategy):
                                                     ending_n)
         self.search_index = ending_n + 1
         return sums
-
-
-@dataclass(frozen=True)
-class SuperabundantEnumerationIndex:
-    level: int
-    index_in_level: int
 
 
 class SuperabundantSearchStrategy(SearchStrategy):

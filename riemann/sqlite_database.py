@@ -1,17 +1,26 @@
 from dataclasses import asdict
 from riemann.database import DivisorDb
+from riemann.database import SearchMetadataDb
 from riemann.types import RiemannDivisorSum
+from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
+from riemann.types import deserialize_search_state
 from typing import List
+from typing import Union
 import sqlite3
 
 
-class SqliteDivisorDb(DivisorDb):
+class SqliteDivisorDb(DivisorDb, SearchMetadataDb):
     def __init__(self, database_path=None):
         '''Create a database connection.'''
         if database_path is None:
             raise ValueError("Must specify a database path!")
-        self.connection = sqlite3.connect(database_path)
+        '''
+        PARSE_DECLTYPES results in the automated conversion of sqlite
+        timestamp to python datetime.
+        '''
+        self.connection = sqlite3.connect(database_path,
+                                          detect_types=sqlite3.PARSE_DECLTYPES)
 
     def initialize_schema(self):
         cursor = self.connection.cursor()
@@ -20,6 +29,14 @@ class SqliteDivisorDb(DivisorDb):
             n UNSIGNED BIG INT CONSTRAINT divisor_sum_pk PRIMARY KEY,
             divisor_sum UNSIGNED BIG INT,
             witness_value REAL
+        );''')
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS SearchMetadata (
+            start_time timestamp,
+            end_time timestamp,
+            search_state_type TEXT,
+            starting_search_state TEXT,
+            ending_search_state TEXT
         );''')
         self.connection.commit()
 
@@ -88,6 +105,69 @@ class SqliteDivisorDb(DivisorDb):
 
         return SummaryStats(largest_computed_n=largest_n_record,
                             largest_witness_value=largest_witness_record)
+
+    def latest_search_metadata(
+            self, search_state_type: str) -> Union[SearchMetadata, None]:
+        cursor = self.connection.cursor()
+        cursor.execute(
+            '''
+            SELECT
+              start_time,
+              end_time,
+              search_state_type,
+              starting_search_state,
+              ending_search_state
+            FROM SearchMetadata
+            WHERE search_state_type = :search_state_type
+            ORDER BY end_time DESC
+            LIMIT 1;
+        ''', {'search_state_type': search_state_type})
+
+        row = cursor.fetchone()
+        if not row:
+            return None
+
+        return SearchMetadata(
+            start_time=row[0],
+            end_time=row[1],
+            search_state_type=row[2],
+            starting_search_state=deserialize_search_state(
+                search_state_type, row[3]),
+            ending_search_state=deserialize_search_state(
+                search_state_type, row[4]),
+        )
+
+    def insert_search_metadata(self, metadata: SearchMetadata) -> None:
+        cursor = self.connection.cursor()
+        query = '''
+        INSERT INTO
+            SearchMetadata(
+              start_time,
+              end_time,
+              search_state_type,
+              starting_search_state,
+              ending_search_state
+            )
+            VALUES(
+                :start_time,
+
+                :end_time,
+                :search_state_type,
+                :starting_search_state,
+                :ending_search_state)
+        '''
+
+        cursor.execute(
+            query, {
+                'start_time': metadata.start_time,
+                'end_time': metadata.end_time,
+                'search_state_type': metadata.search_state_type,
+                'starting_search_state':
+                metadata.starting_search_state.serialize(),
+                'ending_search_state':
+                metadata.ending_search_state.serialize(),
+            })
+        self.connection.commit()
 
 
 if __name__ == "__main__":
