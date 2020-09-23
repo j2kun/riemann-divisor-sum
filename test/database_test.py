@@ -1,7 +1,11 @@
+from datetime import datetime
 from riemann.database import DivisorDb
+from riemann.database import SearchMetadataDb
 from riemann.in_memory_database import InMemoryDivisorDb
 from riemann.sqlite_database import SqliteDivisorDb
+from riemann.types import ExhaustiveSearchIndex
 from riemann.types import RiemannDivisorSum
+from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
 import pytest
 
@@ -13,7 +17,7 @@ def createSqliteDb():
 
 
 @pytest.mark.parametrize('newDatabase', [InMemoryDivisorDb, createSqliteDb])
-class TestInMemoryDatabase:
+class TestDatabase:
     def test_initially_empty(self, newDatabase):
         db: DivisorDb = newDatabase()
         assert len(db.load()) == 0
@@ -78,3 +82,45 @@ class TestInMemoryDatabase:
                                 largest_witness_value=records[1])
 
         assert expected == db.summarize()
+
+    def test_fetch_empty_metadata(self, newDatabase):
+        name = "ExhaustiveSearchIndex"
+        db: SearchMetadataDb = newDatabase()
+        assert db.latest_search_metadata(name) is None
+
+    def test_store_metadata(self, newDatabase):
+        name = "ExhaustiveSearchIndex"
+        db: SearchMetadataDb = newDatabase()
+        metadata = [
+            SearchMetadata(start_time=datetime(2020, 9, 1, 0, 0, 0),
+                           end_time=datetime(2020, 9, 1, 1, 0, 0),
+                           search_state_type=name,
+                           starting_search_state=ExhaustiveSearchIndex(n=1),
+                           ending_search_state=ExhaustiveSearchIndex(n=2)),
+        ]
+
+        db.insert_search_metadata(metadata[0])
+        assert metadata[0] == db.latest_search_metadata(name)
+
+    def test_store_metadata_ordering(self, newDatabase):
+        name = "ExhaustiveSearchIndex"
+        db: SearchMetadataDb = newDatabase()
+        older_time = datetime(2016, 9, 1, 1, 0, 0)
+        newer_time = datetime(2020, 9, 1, 1, 0, 0)
+        metadata = [
+            SearchMetadata(start_time=older_time,
+                           end_time=older_time,
+                           search_state_type=name,
+                           starting_search_state=ExhaustiveSearchIndex(n=1),
+                           ending_search_state=ExhaustiveSearchIndex(n=2)),
+            SearchMetadata(start_time=newer_time,
+                           end_time=newer_time,
+                           search_state_type=name,
+                           starting_search_state=ExhaustiveSearchIndex(n=1),
+                           ending_search_state=ExhaustiveSearchIndex(n=2)),
+        ]
+
+        # insert the newer one first
+        db.insert_search_metadata(metadata[1])
+        db.insert_search_metadata(metadata[0])
+        assert metadata[1] == db.latest_search_metadata(name)
