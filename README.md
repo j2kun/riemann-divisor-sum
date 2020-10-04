@@ -15,17 +15,24 @@ Requires
 
 - [GMP](https://gmplib.org/) for arbitrary precision arithmetic
 - [gmpy2](https://gmpy2.readthedocs.io/en/latest/intro.html) for Python GMP bindings
+- postgres or sqlite3
 
-On Mac OS X this can be installed via brew as follows
+On Mac OS X these can be installed via brew as follows
 
 ```
-brew install gmp
-brew install mpfr
-brew install libmpc
+brew install gmp mpfr libmpc postgresql
 ```
 
 Then, in a virtualenv,
 
 ```
 pip install gmpy2
+```
+
+For postgres, create a new database cluster
+and start the server.
+
+```
+initdb --locale=C -E UTF-8 /usr/local/var/postgres
+pg_ctl -D /usr/local/var/postgres -l /tmp/logfile start
 ```
