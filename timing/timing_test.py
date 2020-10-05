@@ -8,6 +8,7 @@ import time
 numba.compute_riemann_divisor_sum(
         numba.partition_to_prime_factorization(
             numba.partitions_of_n(4)[1]))
+gmpy.partitions_of_n(4)
 
 
 def run_test(module, module_name):

@@ -1,5 +1,6 @@
 from functools import reduce
 from gmpy2 import mpz
+from numba import njit
 from riemann.primes import primes
 from riemann.types import Partition
 from riemann.types import PrimeFactorization
@@ -8,6 +9,7 @@ from typing import List
 import math
 
 
+@njit
 def partitions_of_n(n: int) -> List[Partition]:
     '''Compute all partitions of an integer n.'''
     p = [0] * n
