@@ -1,5 +1,6 @@
-from timing import numba
 from timing import gmpy
+from timing import numba
+import cProfile
 import time
 
 
@@ -26,3 +27,7 @@ numba_time = run_test(numba, "numba")
 gmpy_time = run_test(gmpy, "gmpy")
 
 print(numba_time / gmpy_time)
+
+
+print("------- cprofile -------")
+cProfile.runctx('run_test(gmpy, "gmpy")', globals(), locals())
