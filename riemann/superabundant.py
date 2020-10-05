@@ -1,4 +1,5 @@
 from functools import reduce
+from gmpy2 import mpz
 from numba import njit
 from riemann.primes import primes
 from riemann.types import Partition
@@ -46,16 +47,15 @@ def partition_to_prime_factorization(
     return [(primes[i], exp) for (i, exp) in enumerate(partition)]
 
 
-@njit
 def prime_factor_divisor_sum(prime_factors: PrimeFactorization) -> int:
     '''Compute the sum of divisors of a positive integer
     expressed in its prime factorization.'''
     if not prime_factors:
         return 1
 
-    divisor_sum = 1
+    divisor_sum = mpz(1)
     for (prime, exponent) in prime_factors:
-        divisor_sum *= int((prime**(exponent + 1) - 1) / (prime - 1))
+        divisor_sum *= int((mpz(prime)**(exponent + 1) - 1) / (prime - 1))
 
     return divisor_sum
 
@@ -63,7 +63,7 @@ def prime_factor_divisor_sum(prime_factors: PrimeFactorization) -> int:
 def compute_riemann_divisor_sum(
         factorization: PrimeFactorization) -> RiemannDivisorSum:
     '''Compute a divisor sum.'''
-    n = reduce(lambda x, y: x * y, (p**a for (p, a) in factorization))
+    n = reduce(lambda x, y: x * y, (mpz(p)**a for (p, a) in factorization))
     ds = prime_factor_divisor_sum(factorization)
     wv = ds / (n * math.log(math.log(n)))
     return RiemannDivisorSum(n=n, divisor_sum=ds, witness_value=wv)
