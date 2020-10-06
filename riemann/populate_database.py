@@ -5,7 +5,7 @@ from riemann.database import SearchMetadataDb
 from riemann.divisor import compute_riemann_divisor_sums
 from riemann.search_strategy import SearchStrategy
 from riemann.search_strategy import search_strategy_by_name
-from riemann.sqlite_database import SqliteDivisorDb
+from riemann.postgres_database import PostgresDivisorDb
 from riemann.types import SearchMetadata
 from riemann.types import SearchState
 
@@ -20,10 +20,13 @@ def search_strategy(metadataDb: SearchMetadataDb,
     '''
     search_strategy_class = search_strategy_by_name(search_strategy_name)
     print(f"Searching with strategy {search_strategy_name}")
-    starting_search_state = metadataDb.latest_search_metadata(
+    latest_metadata = metadataDb.latest_search_metadata(
         search_strategy_class().search_state().__class__.__name__)
-    if not starting_search_state:
+    if not latest_metadata:
+        print(f"Could not find an existing search state in the DB. Using default.")
         starting_search_state = search_strategy_class().search_state()
+    else:
+        starting_search_state = latest_metadata.ending_search_state
     print(f"Starting from search state {starting_search_state}")
     return search_strategy_class().starting_from(starting_search_state)
 
@@ -45,7 +48,7 @@ def populate_db(divisorDb: DivisorDb, metadataDb: SearchMetadataDb,
             SearchMetadata(
                 start_time=start,
                 end_time=end,
-                search_state_type=search_strategy.__class__.__name__,
+                search_state_type=end_state.__class__.__name__,
                 starting_search_state=start_state,
                 ending_search_state=end_state))
 
@@ -54,7 +57,7 @@ if __name__ == "__main__":
     import sys
     if len(sys.argv) not in [3, 4]:
         print('''
-Usage: python populate_database DB_PATH SEARCH_STRATEGY_NAME [BATCH_SIZE]
+Usage: python -m riemann.populate_database DATA_SOURCE_NAME SEARCH_STRATEGY_NAME [BATCH_SIZE]
 
 SEARCH_STRATEGY_NAME can be one of
 
@@ -62,7 +65,7 @@ SEARCH_STRATEGY_NAME can be one of
  - SuperabundantSearchStrategy
 ''')
 
-    db = SqliteDivisorDb(database_path=sys.argv[1])
+    db = PostgresDivisorDb(data_source_name=sys.argv[1])
     search_strategy_name = sys.argv[2]
     batch_size = int(sys.argv[3]) if len(sys.argv) == 4 else DEFAULT_BATCH_SIZE
 
