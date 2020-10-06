@@ -72,13 +72,14 @@ class PostgresDivisorDb(DivisorDb, SearchMetadataDb):
             divisor_sum=excluded.divisor_sum,
             witness_value=excluded.witness_value;
         '''
-        template = "(%(n)s, %(divisor_sum)s, %(witness_value)s)"
+        template = "(%s::mpz, %s::mpz, %s)"
+        arglist = [("%s" % record.n, "%s" % record.divisor_sum,
+                    float(record.witness_value)) for record in records]
 
-        psycopg2.extras.execute_values(
-            cur=cursor,
-            sql=query,
-            argslist=[asdict(record) for record in records],
-            template=template)
+        psycopg2.extras.execute_values(cur=cursor,
+                                       sql=query,
+                                       argslist=arglist,
+                                       template=template)
         self.connection.commit()
 
     def summarize(self) -> SummaryStats:
