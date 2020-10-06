@@ -2,25 +2,47 @@ from datetime import datetime
 from riemann.database import DivisorDb
 from riemann.database import SearchMetadataDb
 from riemann.in_memory_database import InMemoryDivisorDb
+from riemann.postgres_database import PostgresDivisorDb
 from riemann.sqlite_database import SqliteDivisorDb
 from riemann.types import ExhaustiveSearchIndex
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
 import pytest
+import testing.postgresql
+
+
+def noop_teardown():
+    pass
 
 
 def createSqliteDb():
     db = SqliteDivisorDb(database_path=":memory:")
     db.initialize_schema()
+    db.teardown = noop_teardown
     return db
 
 
-@pytest.mark.parametrize('newDatabase', [InMemoryDivisorDb, createSqliteDb])
+def createInMemoryDb():
+    db = InMemoryDivisorDb()
+    db.teardown = noop_teardown
+    return db
+
+
+def createPostgresDb():
+    tmp_postgres = testing.postgresql.Postgresql()
+    db = PostgresDivisorDb(data_source_dict=tmp_postgres.dsn())
+    db.initialize_schema()
+    db.teardown = tmp_postgres.stop
+    return db
+
+
+@pytest.mark.parametrize('newDatabase', [createInMemoryDb, createSqliteDb, createPostgresDb])
 class TestDatabase:
     def test_initially_empty(self, newDatabase):
         db: DivisorDb = newDatabase()
         assert len(db.load()) == 0
+        db.teardown()
 
     def test_upsert_from_empty(self, newDatabase):
         db: DivisorDb = newDatabase()
@@ -31,6 +53,7 @@ class TestDatabase:
 
         db.upsert(records)
         assert set(db.load()) == set(records)
+        db.teardown()
 
     def test_upsert_from_nonempty(self, newDatabase):
         db: DivisorDb = newDatabase()
@@ -47,6 +70,7 @@ class TestDatabase:
         db.upsert(new_records)
 
         assert set(db.load()) == set(records + new_records)
+        db.teardown()
 
     def test_upsert_overrides(self, newDatabase):
         db: DivisorDb = newDatabase()
@@ -63,6 +87,7 @@ class TestDatabase:
         db.upsert(new_records)
 
         assert set(db.load()) == set([records[1]] + new_records)
+        db.teardown()
 
     def test_summarize_empty(self, newDatabase):
         db: DivisorDb = newDatabase()
@@ -70,6 +95,7 @@ class TestDatabase:
                                 largest_witness_value=None)
 
         assert expected == db.summarize()
+        db.teardown()
 
     def test_summarize_nonempty(self, newDatabase):
         db: DivisorDb = newDatabase()
@@ -82,11 +108,13 @@ class TestDatabase:
                                 largest_witness_value=records[1])
 
         assert expected == db.summarize()
+        db.teardown()
 
     def test_fetch_empty_metadata(self, newDatabase):
         name = "ExhaustiveSearchIndex"
         db: SearchMetadataDb = newDatabase()
         assert db.latest_search_metadata(name) is None
+        db.teardown()
 
     def test_store_metadata(self, newDatabase):
         name = "ExhaustiveSearchIndex"
@@ -101,6 +129,7 @@ class TestDatabase:
 
         db.insert_search_metadata(metadata[0])
         assert metadata[0] == db.latest_search_metadata(name)
+        db.teardown()
 
     def test_store_metadata_ordering(self, newDatabase):
         name = "ExhaustiveSearchIndex"
@@ -124,3 +153,4 @@ class TestDatabase:
         db.insert_search_metadata(metadata[1])
         db.insert_search_metadata(metadata[0])
         assert metadata[1] == db.latest_search_metadata(name)
+        db.teardown()
