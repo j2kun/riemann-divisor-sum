@@ -67,7 +67,11 @@ class SqliteDivisorDb(DivisorDb, SearchMetadataDb):
             witness_value=excluded.witness_value;
         '''
 
-        cursor.executemany(query, [asdict(record) for record in records])
+        cursor.executemany(query, [{
+            'n': int(record.n),
+            'divisor_sum': int(record.divisor_sum),
+            'witness_value': float(record.witness_value)
+        } for record in records])
         self.connection.commit()
 
     def summarize(self) -> SummaryStats:
@@ -150,7 +154,6 @@ class SqliteDivisorDb(DivisorDb, SearchMetadataDb):
             )
             VALUES(
                 :start_time,
-
                 :end_time,
                 :search_state_type,
                 :starting_search_state,

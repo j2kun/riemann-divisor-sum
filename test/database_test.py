@@ -1,4 +1,5 @@
 from datetime import datetime
+from gmpy2 import mpz
 from riemann.database import DivisorDb
 from riemann.database import SearchMetadataDb
 from riemann.in_memory_database import InMemoryDivisorDb
@@ -49,6 +50,16 @@ class TestDatabase:
         records = [
             RiemannDivisorSum(n=1, divisor_sum=1, witness_value=1),
             RiemannDivisorSum(n=2, divisor_sum=2, witness_value=2),
+        ]
+
+        db.upsert(records)
+        assert set(db.load()) == set(records)
+        db.teardown()
+
+    def test_upsert_mpz(self, newDatabase):
+        db: DivisorDb = newDatabase()
+        records = [
+            RiemannDivisorSum(n=mpz(1), divisor_sum=mpz(1), witness_value=1),
         ]
 
         db.upsert(records)
