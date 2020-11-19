@@ -7,4 +7,6 @@ pg_ctl -D /usr/local/var/postgres -l /tmp/logfile start
 psql postgres <<EOF
 CREATE DATABASE divisor
     WITH OWNER = $USER;
+\connect divisor;
+CREATE EXTENSION pgmp;
 EOF

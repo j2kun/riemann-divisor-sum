@@ -62,3 +62,11 @@ See https://github.com/dvarrazzo/pgmp/issues/4 if you run into issues.
 # brew info gmp
 export C_INCLUDE_PATH="/usr/local/Cellar/gmp/6.2.0/include:$C_INCLUDE_PATH"
 ```
+
+In this case, you may also want to build pgmp from source,
+
+```bash
+git clone https://github.com/j2kun/pgmp && cd pgmp
+make
+sudo make install
+```
