@@ -1,15 +1,14 @@
-from dataclasses import asdict
+from typing import List
+from typing import Union
+
+import psycopg2.extras
 from gmpy2 import mpz
 from riemann.database import DivisorDb
 from riemann.database import SearchMetadataDb
+from riemann.types import deserialize_search_state
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
-from riemann.types import deserialize_search_state
-from typing import List
-from typing import Union
-import psycopg2
-import psycopg2.extras
 
 DEFAULT_DATA_SOURCE_NAME = 'dbname=divisor'
 

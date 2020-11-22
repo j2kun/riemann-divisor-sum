@@ -4,15 +4,16 @@ from __future__ import annotations
 
 from abc import ABC
 from abc import abstractmethod
-from dataclasses import dataclass
+from typing import List
+
 from riemann import divisor
 from riemann import superabundant
 from riemann.superabundant import partition_to_prime_factorization
 from riemann.superabundant import partitions_of_n
 from riemann.types import ExhaustiveSearchIndex
+from riemann.types import RiemannDivisorSum
 from riemann.types import SearchState
 from riemann.types import SuperabundantEnumerationIndex
-from typing import List
 
 
 class SearchStrategy(ABC):

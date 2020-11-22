@@ -1,13 +1,13 @@
-from dataclasses import asdict
+import sqlite3
+from typing import List
+from typing import Union
+
 from riemann.database import DivisorDb
 from riemann.database import SearchMetadataDb
+from riemann.types import deserialize_search_state
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
-from riemann.types import deserialize_search_state
-from typing import List
-from typing import Union
-import sqlite3
 
 
 class SqliteDivisorDb(DivisorDb, SearchMetadataDb):

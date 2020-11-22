@@ -1,8 +1,8 @@
+import pytest
 from riemann.search_strategy import ExhaustiveSearchIndex
 from riemann.search_strategy import ExhaustiveSearchStrategy
 from riemann.search_strategy import SuperabundantEnumerationIndex
 from riemann.search_strategy import SuperabundantSearchStrategy
-import pytest
 
 
 @pytest.mark.parametrize(

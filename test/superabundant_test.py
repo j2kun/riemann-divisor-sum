@@ -1,13 +1,13 @@
 from functools import reduce
+
+import hypothesis.strategies as st
+import pytest
 from hypothesis import given
 from hypothesis import settings
 from riemann.divisor import divisor_sum
 from riemann.primes import primes
 from riemann.superabundant import partitions_of_n
 from riemann.superabundant import prime_factor_divisor_sum
-import hypothesis.strategies as st
-import pytest
-
 
 expected_partitions = [
     [[1]],
@@ -73,5 +73,3 @@ def test_prime_factor_divisor_sum(prime_factorization):
 
 def test_prime_factor_divisor_sum_2():
     assert prime_factor_divisor_sum([(2, 1)]) == divisor_sum(2)
-
-

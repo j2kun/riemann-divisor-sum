@@ -1,9 +1,9 @@
 '''Compute the sum of divisors of a number.'''
+import math
+from typing import List
+
 from numba import njit
 from riemann.types import RiemannDivisorSum
-from typing import List
-from typing import Tuple
-import math
 
 
 @njit
@@ -40,6 +40,8 @@ def compute_riemann_divisor_sums(start_n: int,
     for n in range(start_n, end_n + 1):
         ds = divisor_sum(n)
         wv = witness_value(n, precomputed_divisor_sum=ds)
-        output[n - start_n] = RiemannDivisorSum(n=n, divisor_sum=ds, witness_value=wv)
+        output[n - start_n] = RiemannDivisorSum(n=n,
+                                                divisor_sum=ds,
+                                                witness_value=wv)
 
     return output

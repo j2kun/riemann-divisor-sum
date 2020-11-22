@@ -1,11 +1,11 @@
 '''An interface for a database containing divisor sums.'''
-
 from abc import ABC
 from abc import abstractmethod
+from typing import List
+
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
-from typing import List
 
 
 class DivisorDb(ABC):

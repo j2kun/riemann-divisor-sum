@@ -1,13 +1,12 @@
 '''A simple cli to populate the database.'''
 from datetime import datetime
+
 from riemann.database import DivisorDb
 from riemann.database import SearchMetadataDb
-from riemann.divisor import compute_riemann_divisor_sums
-from riemann.search_strategy import SearchStrategy
-from riemann.search_strategy import search_strategy_by_name
 from riemann.postgres_database import PostgresDivisorDb
+from riemann.search_strategy import search_strategy_by_name
+from riemann.search_strategy import SearchStrategy
 from riemann.types import SearchMetadata
-from riemann.types import SearchState
 
 DEFAULT_BATCH_SIZE = 250000
 
@@ -23,7 +22,8 @@ def search_strategy(metadataDb: SearchMetadataDb,
     latest_metadata = metadataDb.latest_search_metadata(
         search_strategy_class().search_state().__class__.__name__)
     if not latest_metadata:
-        print(f"Could not find an existing search state in the DB. Using default.")
+        print("Could not find an existing search state in the DB. "
+              "Using default.")
         starting_search_state = search_strategy_class().search_state()
     else:
         starting_search_state = latest_metadata.ending_search_state
@@ -43,14 +43,15 @@ def populate_db(divisorDb: DivisorDb, metadataDb: SearchMetadataDb,
         db.upsert(search_strategy.next_batch(batch_size))
         end_state = search_strategy.search_state()
         end = datetime.now()
-        print(f"Computed [{start_state.serialize()}, {end_state.serialize()}] in {end-start}")
+        print(
+            f"Computed [{start_state.serialize()}, {end_state.serialize()}] in {end-start}"
+        )
         metadataDb.insert_search_metadata(
-            SearchMetadata(
-                start_time=start,
-                end_time=end,
-                search_state_type=end_state.__class__.__name__,
-                starting_search_state=start_state,
-                ending_search_state=end_state))
+            SearchMetadata(start_time=start,
+                           end_time=end,
+                           search_state_type=end_state.__class__.__name__,
+                           starting_search_state=start_state,
+                           ending_search_state=end_state))
 
 
 if __name__ == "__main__":

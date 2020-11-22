@@ -1,4 +1,7 @@
 from datetime import datetime
+
+import pytest
+import testing.postgresql
 from gmpy2 import mpz
 from riemann.database import DivisorDb
 from riemann.database import SearchMetadataDb
@@ -9,8 +12,6 @@ from riemann.types import ExhaustiveSearchIndex
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
-import pytest
-import testing.postgresql
 
 
 def noop_teardown():
@@ -38,7 +39,8 @@ def createPostgresDb():
     return db
 
 
-@pytest.mark.parametrize('newDatabase', [createInMemoryDb, createSqliteDb, createPostgresDb])
+@pytest.mark.parametrize('newDatabase',
+                         [createInMemoryDb, createSqliteDb, createPostgresDb])
 class TestDatabase:
     def test_initially_empty(self, newDatabase):
         db: DivisorDb = newDatabase()

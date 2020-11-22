@@ -1,12 +1,13 @@
+import math
 from functools import reduce
+from typing import List
+
 from gmpy2 import mpz
 from numba import njit
 from riemann.primes import primes
 from riemann.types import Partition
 from riemann.types import PrimeFactorization
 from riemann.types import RiemannDivisorSum
-from typing import List
-import math
 
 
 @njit
