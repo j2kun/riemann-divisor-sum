@@ -14,6 +14,8 @@ DEFAULT_DATA_SOURCE_NAME = 'dbname=divisor'
 
 
 class PostgresDivisorDb(DivisorDb, SearchMetadataDb):
+    '''A database implementation using postgres.'''
+
     def __init__(self, data_source_name=None, data_source_dict=None):
         '''Create a database connection.'''
         if data_source_name is None and data_source_dict is None:
