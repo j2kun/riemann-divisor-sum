@@ -12,7 +12,7 @@ Blog posts:
 
 ## Development requirements
 
-Requires
+Requires Python 3.7 and
 
 - [GMP](https://gmplib.org/) for arbitrary precision arithmetic
 - [gmpy2](https://gmpy2.readthedocs.io/en/latest/intro.html) for Python GMP bindings
@@ -27,8 +27,10 @@ brew install gmp mpfr libmpc postgresql
 Then, in a virtualenv,
 
 ```
-pip install gmpy2
+pip install -r requrements.txt
 ```
+
+### Local development with PostgreSQL
 
 For postgres, create a new database cluster
 and start the server.
@@ -70,4 +72,58 @@ In this case, you may also want to build pgmp from source,
 git clone https://github.com/j2kun/pgmp && cd pgmp
 make
 sudo make install
+```
+
+## Deploying with Docker
+
+### Locally
+
+```bash
+docker build -t divisordb -f divisordb.Dockerfile .
+docker build -t divisorsearch -f divisorsearch.Dockerfile .
+docker run -d -p 5432:5432 divisordb:latest
+docker run -d divisorsearch:latest
+```
+
+## Deploying with Docker
+
+Running with docker removes the need to install postgres and dependencies.
+
+### Locally
+
+```bash
+docker build -t divisordb -f divisordb.Dockerfile .
+docker build -t divisorsearch -f divisorsearch.Dockerfile .
+
+docker run -d --name divisordb -p 5432:5432 divisordb:latest
+
+# The host address for the divisordb container is nested inside a json
+# `jq` is a CLI for stream processing json data.
+export PGHOST=$(docker network inspect bridge | jq -r '.[0].Containers[] | select(.Name=="divisordb") | .IPv4Address' | sed 's|/.*$||g')
+
+docker run -d --name divisorsearch --env PGHOST=$PGHOST divisorsearch:latest
+```
+
+#### Manual inspection
+
+After the `divisordb` container is up, you can test whether it's working by
+
+```
+pg_isready -d divisor -h $PGHOST -p 5432 -U docker
+```
+
+or by going into the container and checking the database manually
+
+```
+$ docker exec -it divisordb /bin/bash
+# now inside the container
+$ psql
+divisor=# \d   # \d is postgres for 'describe tables'
+
+              List of relations
+ Schema |        Name        | Type  | Owner
+--------+--------------------+-------+--------
+ public | riemanndivisorsums | table | docker
+ public | searchmetadata     | table | docker
+(2 rows)
 ```
