@@ -1,4 +1,5 @@
 #!/bin/bash
+# run this for local development
 
 rm -rf /usr/local/var/postgres
 initdb --locale=C -E UTF-8 /usr/local/var/postgres
