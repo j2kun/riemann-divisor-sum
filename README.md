@@ -8,6 +8,7 @@ Blog posts:
 - https://jeremykun.com/2020/09/11/searching-for-rh-counterexamples-setting-up-pytest/
 - https://jeremykun.com/2020/09/11/searching-for-rh-counterexamples-adding-a-database/
 - https://jeremykun.com/2020/09/28/searching-for-rh-counterexamples-search-strategies/
+- https://jeremykun.com/2020/10/13/searching-for-rh-counterexamples-unbounded-integers/
 
 ## Development requirements
 
