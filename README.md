@@ -74,15 +74,22 @@ make
 sudo make install
 ```
 
-## Deploying with Docker
-
-### Locally
+## Running the program
 
 ```bash
-docker build -t divisordb -f divisordb.Dockerfile .
-docker build -t divisorsearch -f divisorsearch.Dockerfile .
-docker run -d -p 5432:5432 divisordb:latest
-docker run -d divisorsearch:latest
+python -m riemann.populate_database --help
+usage: populate_database.py [-h] [--data_source_name DATA_SOURCE_NAME]
+                            [--search_strategy_name {ExhaustiveSearchStrategy,SuperabundantSearchStrategy}]
+                            [--batch_size BATCH_SIZE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --data_source_name DATA_SOURCE_NAME
+                        The psycopg data_source_name string
+  --search_strategy_name {ExhaustiveSearchStrategy,SuperabundantSearchStrategy}
+                        The search strategy name
+  --batch_size BATCH_SIZE
+                        The size of search batches
 ```
 
 ## Deploying with Docker

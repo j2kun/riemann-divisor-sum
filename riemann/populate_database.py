@@ -8,7 +8,7 @@ from riemann.search_strategy import search_strategy_by_name
 from riemann.search_strategy import SearchStrategy
 from riemann.types import SearchMetadata
 
-DEFAULT_BATCH_SIZE = 250000
+DEFAULT_BATCH_SIZE = 10000
 
 
 def search_strategy(metadataDb: SearchMetadataDb,
@@ -55,20 +55,24 @@ def populate_db(divisorDb: DivisorDb, metadataDb: SearchMetadataDb,
 
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) not in [3, 4]:
-        print('''
-Usage: python -m riemann.populate_database DATA_SOURCE_NAME SEARCH_STRATEGY_NAME [BATCH_SIZE]
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_source_name', type=str,
+                        help='The psycopg data_source_name string')
+    parser.add_argument('--search_strategy_name', type=str,
+                        choices=['ExhaustiveSearchStrategy',
+                                 'SuperabundantSearchStrategy'],
+                        default='SuperabundantSearchStrategy',
+                        help='The search strategy name')
+    parser.add_argument('--batch_size', type=int,
+                        default=DEFAULT_BATCH_SIZE,
+                        help='The size of search batches'
+                        )
 
-SEARCH_STRATEGY_NAME can be one of
-
- - ExhaustiveSearchStrategy
- - SuperabundantSearchStrategy
-''')
-
-    db = PostgresDivisorDb(data_source_name=sys.argv[1])
-    search_strategy_name = sys.argv[2]
-    batch_size = int(sys.argv[3]) if len(sys.argv) == 4 else DEFAULT_BATCH_SIZE
+    args = parser.parse_args()
+    db = PostgresDivisorDb(data_source_name=args.data_source_name)
+    search_strategy_name = args.search_strategy_name
+    batch_size = args.batch_size
 
     try:
         populate_db(db, db, search_strategy(db, search_strategy_name),
