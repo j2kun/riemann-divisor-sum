@@ -8,7 +8,7 @@ from riemann.search_strategy import search_strategy_by_name
 from riemann.search_strategy import SearchStrategy
 from riemann.types import SearchMetadata
 
-DEFAULT_BATCH_SIZE = 10000
+DEFAULT_BATCH_SIZE = 250000
 
 
 def search_strategy(metadataDb: SearchMetadataDb,
