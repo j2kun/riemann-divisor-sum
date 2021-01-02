@@ -1,0 +1,52 @@
+96.47424983978271
+103.36028790473938
+106.6453959941864
+114.45080780982971
+114.48253273963928
+------- cprofile -------
+126.91272068023682
+150.97385716438293
+161.33747482299805
+203.75560593605042
+235.87123775482178
+         972607979 function calls in 931.924 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    7.429    7.429  935.489  935.489 <string>:1(<module>)
+  1250002    1.797    0.000    1.797    0.000 <string>:1(__init__)
+ 60397371   25.729    0.000   48.371    0.000 <string>:1(__new__)
+        1    1.177    1.177  928.061  928.061 ec2_timing_test.py:18(run_test)
+ 60397371   56.438    0.000  104.322    0.000 functools.py:765(dispatch)
+ 60397371   61.960    0.000  323.249    0.000 functools.py:819(wrapper)
+        2    0.001    0.000   49.209   24.605 search_strategy.py:116(__maybe_reset_current_level__)
+        1    0.000    0.000    0.000    0.000 search_strategy.py:72(__init__)
+        1    0.000    0.000   49.209   49.209 search_strategy.py:78(starting_from)
+        5   19.285    3.857  877.674  175.535 search_strategy.py:88(next_batch)
+        2   49.209   24.604   49.209   24.604 superabundant.py:13(partitions_of_n)
+  1250000   54.555    0.000  511.566    0.000 superabundant.py:45(partition_to_prime_factorization)
+  1250000  216.671    0.000  230.549    0.000 superabundant.py:51(prime_factor_divisor_sum)
+  1250000   20.080    0.000  344.561    0.000 superabundant.py:64(compute_riemann_divisor_sum)
+ 60397371   30.893    0.000   43.948    0.000 superabundant.py:67(<genexpr>)
+ 57897371   13.628    0.000   13.628    0.000 superabundant.py:67(<lambda>)
+ 60397371   49.244    0.000  156.967    0.000 typeof.py:116(_typeof_int)
+ 60397371   85.391    0.000  457.010    0.000 typeof.py:23(typeof)
+ 60397371   66.403    0.000  107.723    0.000 utils.py:366(bit_length)
+ 60397371   36.354    0.000   36.354    0.000 weakref.py:393(__getitem__)
+ 60397371   22.642    0.000   22.642    0.000 {built-in method __new__ of type object at 0x105100f70}
+ 60397371   11.530    0.000   11.530    0.000 {built-in method _abc.get_cache_token}
+  1250000   30.307    0.000   87.882    0.000 {built-in method _functools.reduce}
+ 60397371   18.651    0.000   18.651    0.000 {built-in method builtins.bin}
+        1    0.002    0.002  935.492  935.492 {built-in method builtins.exec}
+ 60397371   12.534    0.000   12.534    0.000 {built-in method builtins.isinstance}
+ 60397376   10.135    0.000   10.135    0.000 {built-in method builtins.len}
+        5    0.000    0.000    0.000    0.000 {built-in method builtins.print}
+        1    0.000    0.000    0.000    0.000 {built-in method builtins.sum}
+119544742   26.933    0.000   26.933    0.000 {built-in method gmpy2.mpz}
+  2500000    2.483    0.000    2.483    0.000 {built-in method math.log}
+       10    0.000    0.000    0.000    0.000 {built-in method time.time}
+  1250005    0.465    0.000    0.465    0.000 {method 'append' of 'list' objects}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
