@@ -9,6 +9,7 @@ Blog posts:
 - https://jeremykun.com/2020/09/11/searching-for-rh-counterexamples-adding-a-database/
 - https://jeremykun.com/2020/09/28/searching-for-rh-counterexamples-search-strategies/
 - https://jeremykun.com/2020/10/13/searching-for-rh-counterexamples-unbounded-integers/
+- https://jeremykun.com/2021/01/04/searching-for-rh-counterexamples-deploying-with-docker/
 
 ## Development requirements
 
