@@ -21,6 +21,7 @@ def run_test(search_state_start, batch_size):
 
     times = []
     for i in range(samples):
+        print(f'Running sample {i}')
         start = time.time()
         search_strategy.next_batch(batch_size)
         end = time.time()
@@ -30,7 +31,7 @@ def run_test(search_state_start, batch_size):
     return sum(times) / samples
 
 
-run_test(SuperabundantEnumerationIndex(71, 196047), 250000)
+print(run_test(SuperabundantEnumerationIndex(71, 196047), 250000))
 
 
 print("------- cprofile -------")
