@@ -7,7 +7,6 @@ from riemann.database import DivisorDb
 from riemann.database import SearchMetadataDb
 from riemann.in_memory_database import InMemoryDivisorDb
 from riemann.postgres_database import PostgresDivisorDb
-from riemann.sqlite_database import SqliteDivisorDb
 from riemann.types import ExhaustiveSearchIndex
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
@@ -16,13 +15,6 @@ from riemann.types import SummaryStats
 
 def noop_teardown():
     pass
-
-
-def createSqliteDb():
-    db = SqliteDivisorDb(database_path=":memory:")
-    db.initialize_schema()
-    db.teardown = noop_teardown
-    return db
 
 
 def createInMemoryDb():
@@ -40,7 +32,7 @@ def createPostgresDb():
 
 
 @pytest.mark.parametrize('newDatabase',
-                         [createInMemoryDb, createSqliteDb, createPostgresDb])
+                         [createInMemoryDb, createPostgresDb])
 class TestDatabase:
     def test_initially_empty(self, newDatabase):
         db: DivisorDb = newDatabase()
