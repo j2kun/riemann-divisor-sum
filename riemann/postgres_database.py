@@ -33,7 +33,7 @@ class PostgresDivisorDb(DivisorDb, SearchMetadataDb):
         ''')
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS RiemannDivisorSums (
-            n mpz CONSTRAINT divisor_sum_pk PRIMARY KEY,
+            n mpz,
             divisor_sum mpz,
             witness_value double precision
         );''')
@@ -68,10 +68,7 @@ class PostgresDivisorDb(DivisorDb, SearchMetadataDb):
         query = '''
         INSERT INTO
             RiemannDivisorSums(n, divisor_sum, witness_value)
-            VALUES %s
-        ON CONFLICT(n) DO UPDATE SET
-            divisor_sum=excluded.divisor_sum,
-            witness_value=excluded.witness_value;
+            VALUES %s;
         '''
         template = "(%s::mpz, %s::mpz, %s)"
         arglist = [("%s" % record.n, "%s" % record.divisor_sum,
