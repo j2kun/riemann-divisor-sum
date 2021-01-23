@@ -75,21 +75,6 @@ class TestDatabase:
 
         assert set(db.load()) == set(records + new_records)
 
-    def test_upsert_overrides(self, db):
-        records = [
-            RiemannDivisorSum(n=1, divisor_sum=1, witness_value=1),
-            RiemannDivisorSum(n=2, divisor_sum=2, witness_value=2),
-        ]
-        db.upsert(records)
-
-        new_records = [
-            RiemannDivisorSum(n=1, divisor_sum=3, witness_value=3),
-            RiemannDivisorSum(n=4, divisor_sum=4, witness_value=4),
-        ]
-        db.upsert(new_records)
-
-        assert set(db.load()) == set([records[1]] + new_records)
-
     def test_summarize_empty(self, db):
         expected = SummaryStats(largest_computed_n=None,
                                 largest_witness_value=None)
