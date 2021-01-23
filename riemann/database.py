@@ -20,7 +20,7 @@ class DivisorDb(ABC):
         pass
 
     @abstractmethod
-    def upsert(self, data: List[RiemannDivisorSum]) -> None:
+    def insert(self, data: List[RiemannDivisorSum]) -> None:
         '''Insert or update the given list of data points.'''
         pass
 

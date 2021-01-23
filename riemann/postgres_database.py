@@ -63,7 +63,7 @@ class PostgresDivisorDb(DivisorDb, SearchMetadataDb):
         ''')
         return self.convert_records(cursor.fetchall())
 
-    def upsert(self, records: List[RiemannDivisorSum]) -> None:
+    def insert(self, records: List[RiemannDivisorSum]) -> None:
         cursor = self.connection.cursor()
         query = '''
         INSERT INTO

@@ -40,7 +40,7 @@ def populate_db(divisorDb: DivisorDb, metadataDb: SearchMetadataDb,
     while True:
         start = datetime.now()
         start_state = search_strategy.search_state()
-        db.upsert(search_strategy.next_batch(batch_size))
+        db.insert(search_strategy.next_batch(batch_size))
         end_state = search_strategy.search_state()
         end = datetime.now()
         print(

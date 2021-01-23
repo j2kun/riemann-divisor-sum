@@ -19,7 +19,7 @@ class InMemoryDivisorDb(DivisorDb, SearchMetadataDb):
     def initialize_schema(self):
         pass
 
-    def upsert(self, records: List[RiemannDivisorSum]) -> None:
+    def insert(self, records: List[RiemannDivisorSum]) -> None:
         for record in records:
             self.data[record.n] = record
 
