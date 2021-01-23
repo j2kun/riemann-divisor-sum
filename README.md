@@ -135,3 +135,17 @@ divisor=# \d   # \d is postgres for 'describe tables'
  public | searchmetadata     | table | docker
 (2 rows)
 ```
+
+#### On EC2
+
+```bash
+# install docker, see get.docker.com
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker ubuntu
+
+# log out and log back in
+
+git clone https://github.com/j2kun/riemann-divisor-sum && cd riemann-divisor-sum
+bash deploy.sh
+```
