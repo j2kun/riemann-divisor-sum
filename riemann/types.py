@@ -1,6 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
+from dataclasses import field
 from datetime import datetime
 from enum import Enum
 from hashlib import sha256
@@ -78,12 +79,13 @@ class SearchBlockState(Enum):
 
 @dataclass(frozen=True)
 class SearchMetadata:
-    start_time: datetime
-    end_time: datetime
-    search_state_type: str
-    state: SearchBlockState
     starting_search_state: SearchState
     ending_search_state: SearchState
+    search_state_type: str = "SuperabundantEnumerationIndex"
+    state: SearchBlockState = SearchBlockState.NOT_STARTED
+    creation_time: datetime = field(default_factory=lambda: datetime.now())
+    start_time: datetime = None
+    end_time: datetime = None
 
     '''
     The hexdigest of the SHA-256 hash of a string
@@ -108,3 +110,10 @@ class SearchMetadata:
     d6062a3151b57f7a65401cbc41d94239ff150b374269d595d9280849d4e2123f
     '''
     block_hash: str = None
+
+    def key(self):
+        return (
+            self.search_state_type,
+            self.starting_search_state,
+            self.ending_search_state,
+        )

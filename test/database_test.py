@@ -106,7 +106,10 @@ class TestDatabase:
         ]
 
         db.insert_search_metadata(metadata[0])
-        assert metadata[0] == db.latest_search_metadata(name)
+        assert (
+            metadata[0].starting_search_state
+            == db.latest_search_metadata(name).starting_search_state
+        )
 
     def test_store_metadata_ordering(self, db):
         name = "ExhaustiveSearchIndex"
@@ -128,4 +131,7 @@ class TestDatabase:
         # insert the newer one first
         db.insert_search_metadata(metadata[1])
         db.insert_search_metadata(metadata[0])
-        assert metadata[1] == db.latest_search_metadata(name)
+        assert (
+            metadata[1].starting_search_state
+            == db.latest_search_metadata(name).starting_search_state
+        )
