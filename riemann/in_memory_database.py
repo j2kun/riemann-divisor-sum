@@ -2,13 +2,12 @@
 from typing import List
 
 from riemann.database import DivisorDb
-from riemann.database import SearchMetadataDb
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
 
 
-class InMemoryDivisorDb(DivisorDb, SearchMetadataDb):
+class InMemoryDivisorDb(DivisorDb):
     def __init__(self):
         self.data = dict()
         self.metadata = list()

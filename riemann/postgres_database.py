@@ -4,7 +4,6 @@ from typing import Union
 import psycopg2.extras
 from gmpy2 import mpz
 from riemann.database import DivisorDb
-from riemann.database import SearchMetadataDb
 from riemann.types import deserialize_search_state
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
@@ -13,7 +12,7 @@ from riemann.types import SummaryStats
 DEFAULT_DATA_SOURCE_NAME = 'dbname=divisor'
 
 
-class PostgresDivisorDb(DivisorDb, SearchMetadataDb):
+class PostgresDivisorDb(DivisorDb):
     '''A database implementation using postgres.'''
 
     def __init__(self, data_source_name=None, data_source_dict=None):

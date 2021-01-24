@@ -29,13 +29,6 @@ class DivisorDb(ABC):
         '''Summarize the contents of the database.'''
         pass
 
-
-class SearchMetadataDb(ABC):
-    @abstractmethod
-    def initialize_schema(self):
-        '''Create the schema for a database, idempotently.'''
-        pass
-
     @abstractmethod
     def latest_search_metadata(self, search_state_type: str) -> SearchMetadata:
         pass

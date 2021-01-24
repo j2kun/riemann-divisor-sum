@@ -4,7 +4,6 @@ import pytest
 import testing.postgresql
 from gmpy2 import mpz
 from riemann.database import DivisorDb
-from riemann.database import SearchMetadataDb
 from riemann.in_memory_database import InMemoryDivisorDb
 from riemann.postgres_database import PostgresDivisorDb
 from riemann.types import ExhaustiveSearchIndex
