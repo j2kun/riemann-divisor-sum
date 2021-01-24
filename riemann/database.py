@@ -16,7 +16,12 @@ class DivisorDb(ABC):
 
     @abstractmethod
     def load(self) -> List[RiemannDivisorSum]:
-        '''Load the entire database.'''
+        '''Load the entire database of Riemann divisor sums.'''
+        pass
+
+    @abstractmethod
+    def load_metadata(self) -> List[SearchMetadata]:
+        '''Load the entire database of Metadata records.'''
         pass
 
     @abstractmethod

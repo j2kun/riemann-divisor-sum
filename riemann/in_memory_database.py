@@ -1,4 +1,5 @@
 '''A simple in-memory divisor database.'''
+from datetime import datetime
 from typing import List
 
 from dataclasses import replace
@@ -16,6 +17,9 @@ class InMemoryDivisorDb(DivisorDb):
 
     def load(self) -> List[RiemannDivisorSum]:
         return list(self.data.values())
+
+    def load_metadata(self) -> List[SearchMetadata]:
+        return list(self.metadata.values())
 
     def initialize_schema(self):
         pass
@@ -39,13 +43,21 @@ class InMemoryDivisorDb(DivisorDb):
             if x.state == SearchBlockState.NOT_STARTED
         ]
         chosen = min(eligible, key=lambda metadata: metadata.creation_time)
-        chosen = replace(chosen, state=SearchBlockState.IN_PROGRESS)
+        chosen = replace(
+            chosen,
+            state=SearchBlockState.IN_PROGRESS,
+            start_time=datetime.now(),
+        )
         self.metadata[chosen.key()] = chosen
         return chosen
 
     def finish_search_block(self, metadata: SearchMetadata,
                             divisor_sums: List[RiemannDivisorSum]) -> None:
-        block = replace(metadata, state=SearchBlockState.FINISHED)
+        block = replace(
+            metadata,
+            state=SearchBlockState.FINISHED,
+            end_time=datetime.now(),
+        )
         self.metadata[block.key()] = block
         for divisor_sum in divisor_sums:
             self.data[divisor_sum.n] = divisor_sum
