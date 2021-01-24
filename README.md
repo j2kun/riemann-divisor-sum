@@ -17,7 +17,7 @@ Requires Python 3.7 and
 
 - [GMP](https://gmplib.org/) for arbitrary precision arithmetic
 - [gmpy2](https://gmpy2.readthedocs.io/en/latest/intro.html) for Python GMP bindings
-- postgres and/or sqlite3
+- postgres
 
 On Mac OS X these can be installed via brew as follows
 
