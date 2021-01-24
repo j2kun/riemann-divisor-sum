@@ -22,7 +22,7 @@ def run_test(batch):
     for i in range(samples):
         print(f'Running sample {i}')
         start = time.time()
-        db.upsert(batch)
+        db.insert(batch)
         end = time.time()
         print(end - start)
         times.append(end - start)

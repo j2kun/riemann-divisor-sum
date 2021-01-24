@@ -2,7 +2,6 @@
 from datetime import datetime
 
 from riemann.database import DivisorDb
-from riemann.database import SearchMetadataDb
 from riemann.postgres_database import PostgresDivisorDb
 from riemann.search_strategy import search_strategy_by_name
 from riemann.search_strategy import SearchStrategy
@@ -11,7 +10,7 @@ from riemann.types import SearchMetadata
 DEFAULT_BATCH_SIZE = 250000
 
 
-def search_strategy(metadataDb: SearchMetadataDb,
+def search_strategy(divisorDb: DivisorDb,
                     search_strategy_name: str) -> SearchStrategy:
     '''Load the approprate search strategy from the database.
 
@@ -19,7 +18,7 @@ def search_strategy(metadataDb: SearchMetadataDb,
     '''
     search_strategy_class = search_strategy_by_name(search_strategy_name)
     print(f"Searching with strategy {search_strategy_name}")
-    latest_metadata = metadataDb.latest_search_metadata(
+    latest_metadata = divisorDb.latest_search_metadata(
         search_strategy_class().search_state().__class__.__name__)
     if not latest_metadata:
         print("Could not find an existing search state in the DB. "
@@ -31,7 +30,7 @@ def search_strategy(metadataDb: SearchMetadataDb,
     return search_strategy_class().starting_from(starting_search_state)
 
 
-def populate_db(divisorDb: DivisorDb, metadataDb: SearchMetadataDb,
+def populate_db(divisorDb: DivisorDb,
                 search_strategy: SearchStrategy, batch_size: int) -> None:
     '''Populate the db in batches.
 
@@ -40,13 +39,13 @@ def populate_db(divisorDb: DivisorDb, metadataDb: SearchMetadataDb,
     while True:
         start = datetime.now()
         start_state = search_strategy.search_state()
-        db.upsert(search_strategy.next_batch(batch_size))
+        db.insert(search_strategy.next_batch(batch_size))
         end_state = search_strategy.search_state()
         end = datetime.now()
         print(
             f"Computed [{start_state.serialize()}, {end_state.serialize()}] in {end-start}"
         )
-        metadataDb.insert_search_metadata(
+        divisorDb.insert_search_metadata(
             SearchMetadata(start_time=start,
                            end_time=end,
                            search_state_type=end_state.__class__.__name__,

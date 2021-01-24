@@ -2,13 +2,12 @@
 from typing import List
 
 from riemann.database import DivisorDb
-from riemann.database import SearchMetadataDb
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
 
 
-class InMemoryDivisorDb(DivisorDb, SearchMetadataDb):
+class InMemoryDivisorDb(DivisorDb):
     def __init__(self):
         self.data = dict()
         self.metadata = list()
@@ -19,7 +18,7 @@ class InMemoryDivisorDb(DivisorDb, SearchMetadataDb):
     def initialize_schema(self):
         pass
 
-    def upsert(self, records: List[RiemannDivisorSum]) -> None:
+    def insert(self, records: List[RiemannDivisorSum]) -> None:
         for record in records:
             self.data[record.n] = record
 

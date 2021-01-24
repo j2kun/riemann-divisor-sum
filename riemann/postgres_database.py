@@ -4,7 +4,6 @@ from typing import Union
 import psycopg2.extras
 from gmpy2 import mpz
 from riemann.database import DivisorDb
-from riemann.database import SearchMetadataDb
 from riemann.types import deserialize_search_state
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
@@ -13,7 +12,7 @@ from riemann.types import SummaryStats
 DEFAULT_DATA_SOURCE_NAME = 'dbname=divisor'
 
 
-class PostgresDivisorDb(DivisorDb, SearchMetadataDb):
+class PostgresDivisorDb(DivisorDb):
     '''A database implementation using postgres.'''
 
     def __init__(self, data_source_name=None, data_source_dict=None):
@@ -33,7 +32,7 @@ class PostgresDivisorDb(DivisorDb, SearchMetadataDb):
         ''')
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS RiemannDivisorSums (
-            n mpz CONSTRAINT divisor_sum_pk PRIMARY KEY,
+            n mpz,
             divisor_sum mpz,
             witness_value double precision
         );''')
@@ -63,15 +62,12 @@ class PostgresDivisorDb(DivisorDb, SearchMetadataDb):
         ''')
         return self.convert_records(cursor.fetchall())
 
-    def upsert(self, records: List[RiemannDivisorSum]) -> None:
+    def insert(self, records: List[RiemannDivisorSum]) -> None:
         cursor = self.connection.cursor()
         query = '''
         INSERT INTO
             RiemannDivisorSums(n, divisor_sum, witness_value)
-            VALUES %s
-        ON CONFLICT(n) DO UPDATE SET
-            divisor_sum=excluded.divisor_sum,
-            witness_value=excluded.witness_value;
+            VALUES %s;
         '''
         template = "(%s::mpz, %s::mpz, %s)"
         arglist = [("%s" % record.n, "%s" % record.divisor_sum,

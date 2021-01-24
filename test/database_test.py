@@ -4,7 +4,6 @@ import pytest
 import testing.postgresql
 from gmpy2 import mpz
 from riemann.database import DivisorDb
-from riemann.database import SearchMetadataDb
 from riemann.in_memory_database import InMemoryDivisorDb
 from riemann.postgres_database import PostgresDivisorDb
 from riemann.types import ExhaustiveSearchIndex
@@ -49,7 +48,7 @@ class TestDatabase:
             RiemannDivisorSum(n=2, divisor_sum=2, witness_value=2),
         ]
 
-        db.upsert(records)
+        db.insert(records)
         assert set(db.load()) == set(records)
 
     def test_upsert_mpz(self, db):
@@ -57,7 +56,7 @@ class TestDatabase:
             RiemannDivisorSum(n=mpz(1), divisor_sum=mpz(1), witness_value=1),
         ]
 
-        db.upsert(records)
+        db.insert(records)
         assert set(db.load()) == set(records)
 
     def test_upsert_from_nonempty(self, db):
@@ -65,30 +64,15 @@ class TestDatabase:
             RiemannDivisorSum(n=1, divisor_sum=1, witness_value=1),
             RiemannDivisorSum(n=2, divisor_sum=2, witness_value=2),
         ]
-        db.upsert(records)
+        db.insert(records)
 
         new_records = [
             RiemannDivisorSum(n=3, divisor_sum=3, witness_value=3),
             RiemannDivisorSum(n=4, divisor_sum=4, witness_value=4),
         ]
-        db.upsert(new_records)
+        db.insert(new_records)
 
         assert set(db.load()) == set(records + new_records)
-
-    def test_upsert_overrides(self, db):
-        records = [
-            RiemannDivisorSum(n=1, divisor_sum=1, witness_value=1),
-            RiemannDivisorSum(n=2, divisor_sum=2, witness_value=2),
-        ]
-        db.upsert(records)
-
-        new_records = [
-            RiemannDivisorSum(n=1, divisor_sum=3, witness_value=3),
-            RiemannDivisorSum(n=4, divisor_sum=4, witness_value=4),
-        ]
-        db.upsert(new_records)
-
-        assert set(db.load()) == set([records[1]] + new_records)
 
     def test_summarize_empty(self, db):
         expected = SummaryStats(largest_computed_n=None,
@@ -101,7 +85,7 @@ class TestDatabase:
             RiemannDivisorSum(n=9, divisor_sum=3, witness_value=3),
             RiemannDivisorSum(n=4, divisor_sum=4, witness_value=4),
         ]
-        db.upsert(records)
+        db.insert(records)
         expected = SummaryStats(largest_computed_n=records[0],
                                 largest_witness_value=records[1])
 

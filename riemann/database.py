@@ -20,20 +20,13 @@ class DivisorDb(ABC):
         pass
 
     @abstractmethod
-    def upsert(self, data: List[RiemannDivisorSum]) -> None:
+    def insert(self, data: List[RiemannDivisorSum]) -> None:
         '''Insert or update the given list of data points.'''
         pass
 
     @abstractmethod
     def summarize(self) -> SummaryStats:
         '''Summarize the contents of the database.'''
-        pass
-
-
-class SearchMetadataDb(ABC):
-    @abstractmethod
-    def initialize_schema(self):
-        '''Create the schema for a database, idempotently.'''
         pass
 
     @abstractmethod
