@@ -72,12 +72,24 @@ class TestDatabase:
         db.insert_search_blocks([metadata])
         actual = db.claim_next_search_block(
             search_index_type='ExhaustiveSearchIndex')
-        assert actual == replace(metadata, state=SearchBlockState.IN_PROGRESS)
+        assert actual.state == SearchBlockState.IN_PROGRESS
+        assert actual.key() == metadata.key()
 
         # no remaining unstarted blocks
         with pytest.raises(ValueError):
             db.claim_next_search_block(
                 search_index_type='ExhaustiveSearchIndex')
+
+    def test_claim_search_block_timestamp_updated(self, db):
+        metadata = SearchMetadata(
+            search_index_type='ExhaustiveSearchIndex',
+            starting_search_index=ExhaustiveSearchIndex(n=1),
+            ending_search_index=ExhaustiveSearchIndex(n=2),
+        )
+        db.insert_search_blocks([metadata])
+        actual = db.claim_next_search_block(
+            search_index_type='ExhaustiveSearchIndex')
+        assert actual.start_time != None
 
     def test_claim_multiple_blocks(self, db):
         self.populate_search_blocks(db)
@@ -104,6 +116,22 @@ class TestDatabase:
             search_index_type='ExhaustiveSearchIndex')
         assert block != next_block
 
+    def test_finish_search_block_timestamp_updated(self, db):
+        self.populate_search_blocks(db)
+        block = db.claim_next_search_block(
+            search_index_type='ExhaustiveSearchIndex')
+
+        records = [
+            RiemannDivisorSum(n=1, divisor_sum=1, witness_value=1),
+            RiemannDivisorSum(n=2, divisor_sum=2, witness_value=2),
+        ]
+
+        db.finish_search_block(block, records)
+        metadata = [
+            x for x in db.load_metadata()
+            if x.state == SearchBlockState.FINISHED
+        ][0]
+        assert metadata.end_time != None
 
     def test_search_block_with_mpz_values(self, db):
         metadatas = [
