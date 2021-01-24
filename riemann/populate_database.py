@@ -74,8 +74,11 @@ if __name__ == "__main__":
     batch_size = args.batch_size
 
     try:
-        populate_db(db, db, search_strategy(db, search_strategy_name),
-                    batch_size)
+        populate_db(
+            db,
+            search_strategy(db, search_strategy_name),
+            batch_size,
+        )
     except KeyboardInterrupt:
         print("Stopping and printing stats...")
     finally:
