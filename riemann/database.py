@@ -20,19 +20,26 @@ class DivisorDb(ABC):
         pass
 
     @abstractmethod
-    def insert(self, data: List[RiemannDivisorSum]) -> None:
-        '''Insert or update the given list of data points.'''
-        pass
-
-    @abstractmethod
     def summarize(self) -> SummaryStats:
         '''Summarize the contents of the database.'''
         pass
 
     @abstractmethod
-    def latest_search_metadata(self, search_state_type: str) -> SearchMetadata:
+    def insert_search_blocks(self, blocks: List[SearchMetadata]) -> None:
+        '''Insert new search blocks, and mark them as not started.'''
         pass
 
     @abstractmethod
-    def insert_search_metadata(self, metadata: SearchMetadata) -> None:
+    def claim_next_search_block(self, search_state_type: str) -> SearchMetadata:
+        '''Claim the next search block, and mark it as started.'''
+        pass
+
+    @abstractmethod
+    def finish_search_block(self,
+                            metadata: SearchMetadata,
+                            divisor_sums: List[RiemannDivisorSum]) -> None:
+        '''
+        Mark a search block as finished, and insert the corresponding divisor
+        sums.
+        '''
         pass
