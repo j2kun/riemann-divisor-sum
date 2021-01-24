@@ -21,15 +21,15 @@ def search_strategy(divisorDb: DivisorDb,
     search_strategy_class = search_strategy_by_name(search_strategy_name)
     print(f"Searching with strategy {search_strategy_name}")
     latest_metadata = divisorDb.latest_search_metadata(
-        search_strategy_class().search_state().__class__.__name__)
+        search_strategy_class().search_index().__class__.__name__)
     if not latest_metadata:
         print("Could not find an existing search state in the DB. "
               "Using default.")
-        starting_search_state = search_strategy_class().search_state()
+        starting_search_index = search_strategy_class().search_index()
     else:
-        starting_search_state = latest_metadata.ending_search_state
-    print(f"Starting from search state {starting_search_state}")
-    return search_strategy_class().starting_from(starting_search_state)
+        starting_search_index = latest_metadata.ending_search_index
+    print(f"Starting from search state {starting_search_index}")
+    return search_strategy_class().starting_from(starting_search_index)
 
 
 def populate_db(divisorDb: DivisorDb,
@@ -40,9 +40,9 @@ def populate_db(divisorDb: DivisorDb,
     '''
     while True:
         start = datetime.now()
-        start_state = search_strategy.search_state()
+        start_index = search_strategy.search_index()
         batch_results = search_strategy.next_batch(batch_size)
-        end_state = search_strategy.search_state()
+        end_index = search_strategy.search_index()
 
         # Only save riemann sums above the threshold. All other values are
         # dropped, and we store the hash of the witness values instead. To
@@ -54,15 +54,15 @@ def populate_db(divisorDb: DivisorDb,
         block_hash = hash_divisor_sums(batch_results)
         end = datetime.now()
         print(
-            f"Computed [{start_state.serialize()}, {end_state.serialize()}] in {end-start}"
+            f"Computed [{start_index.serialize()}, {end_index.serialize()}] in {end-start}"
             f" with hash {block_hash}"
         )
         divisorDb.insert_search_metadata(
             SearchMetadata(start_time=start,
                            end_time=end,
-                           search_state_type=end_state.__class__.__name__,
-                           starting_search_state=start_state,
-                           ending_search_state=end_state,
+                           search_index_type=end_index.__class__.__name__,
+                           starting_search_index=start_index,
+                           ending_search_index=end_index,
                            block_hash=block_hash))
 
 

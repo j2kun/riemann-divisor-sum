@@ -34,7 +34,7 @@ class InMemoryDivisorDb(DivisorDb):
         return SummaryStats(largest_computed_n=largest_computed_n,
                             largest_witness_value=largest_witness_value)
 
-    def latest_search_metadata(self, search_state_type) -> SearchMetadata:
+    def latest_search_metadata(self, search_index_type) -> SearchMetadata:
         if not self.metadata:
             return None
         return max(self.metadata, key=lambda m: m.end_time)

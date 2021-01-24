@@ -4,7 +4,6 @@ from riemann.search_strategy import SuperabundantSearchStrategy
 from riemann.superabundant import partition_to_prime_factorization
 from riemann.superabundant import partitions_of_n
 from riemann.postgres_database import PostgresDivisorDb
-from riemann.types import SearchState
 from riemann.types import SuperabundantEnumerationIndex
 import cProfile
 import numba

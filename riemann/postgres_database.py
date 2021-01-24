@@ -4,7 +4,7 @@ from typing import Union
 import psycopg2.extras
 from gmpy2 import mpz
 from riemann.database import DivisorDb
-from riemann.types import deserialize_search_state
+from riemann.types import deserialize_search_index
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
@@ -40,9 +40,9 @@ class PostgresDivisorDb(DivisorDb):
         CREATE TABLE IF NOT EXISTS SearchMetadata (
             start_time timestamp,
             end_time timestamp,
-            search_state_type TEXT,
-            starting_search_state TEXT,
-            ending_search_state TEXT,
+            search_index_type TEXT,
+            starting_search_index TEXT,
+            ending_search_index TEXT,
             block_hash CHAR(64)
         );''')
         self.connection.commit()
@@ -114,20 +114,20 @@ class PostgresDivisorDb(DivisorDb):
                             largest_witness_value=largest_witness_record)
 
     def latest_search_metadata(
-            self, search_state_type: str) -> Union[SearchMetadata, None]:
+            self, search_index_type: str) -> Union[SearchMetadata, None]:
         cursor = self.connection.cursor()
         cursor.execute('''
             SELECT
               start_time,
               end_time,
-              search_state_type,
-              starting_search_state,
-              ending_search_state
+              search_index_type,
+              starting_search_index,
+              ending_search_index
             FROM SearchMetadata
-            WHERE search_state_type = '%s'
+            WHERE search_index_type = '%s'
             ORDER BY end_time DESC
             LIMIT 1;
-        ''' % search_state_type)
+        ''' % search_index_type)
 
         row = cursor.fetchone()
         if not row:
@@ -136,11 +136,11 @@ class PostgresDivisorDb(DivisorDb):
         return SearchMetadata(
             start_time=row[0],
             end_time=row[1],
-            search_state_type=row[2],
-            starting_search_state=deserialize_search_state(
-                search_state_type, row[3]),
-            ending_search_state=deserialize_search_state(
-                search_state_type, row[4]),
+            search_index_type=row[2],
+            starting_search_index=deserialize_search_index(
+                search_index_type, row[3]),
+            ending_search_index=deserialize_search_index(
+                search_index_type, row[4]),
         )
 
     def insert_search_metadata(self, metadata: SearchMetadata) -> None:
@@ -150,9 +150,9 @@ class PostgresDivisorDb(DivisorDb):
             SearchMetadata(
               start_time,
               end_time,
-              search_state_type,
-              starting_search_state,
-              ending_search_state,
+              search_index_type,
+              starting_search_index,
+              ending_search_index,
               block_hash
             )
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -162,9 +162,9 @@ class PostgresDivisorDb(DivisorDb):
             cursor.mogrify(query, (
                 metadata.start_time,
                 metadata.end_time,
-                metadata.search_state_type,
-                metadata.starting_search_state.serialize(),
-                metadata.ending_search_state.serialize(),
+                metadata.search_index_type,
+                metadata.starting_search_index.serialize(),
+                metadata.ending_search_index.serialize(),
                 metadata.block_hash)))
         self.connection.commit()
 

@@ -30,14 +30,14 @@ class SummaryStats:
     largest_witness_value: RiemannDivisorSum
 
 
-class SearchState(ABC):
+class SearchIndex(ABC):
     @abstractmethod
     def serialize(self) -> str:
         pass
 
 
 @dataclass(frozen=True)
-class ExhaustiveSearchIndex(SearchState):
+class ExhaustiveSearchIndex(SearchIndex):
     n: int
 
     def serialize(self) -> str:
@@ -45,7 +45,7 @@ class ExhaustiveSearchIndex(SearchState):
 
 
 @dataclass(frozen=True)
-class SuperabundantEnumerationIndex(SearchState):
+class SuperabundantEnumerationIndex(SearchIndex):
     level: int
     index_in_level: int
 
@@ -53,16 +53,16 @@ class SuperabundantEnumerationIndex(SearchState):
         return f"{self.level},{self.index_in_level}"
 
 
-def deserialize_search_state(search_state_type: str,
-                             serialized: str) -> SearchState:
-    if search_state_type == ExhaustiveSearchIndex.__name__:
+def deserialize_search_index(search_index_type: str,
+                             serialized: str) -> SearchIndex:
+    if search_index_type == ExhaustiveSearchIndex.__name__:
         return ExhaustiveSearchIndex(n=int(serialized))
-    elif search_state_type == SuperabundantEnumerationIndex.__name__:
+    elif search_index_type == SuperabundantEnumerationIndex.__name__:
         level, index_in_level = serialized.split(",")
         return SuperabundantEnumerationIndex(
             level=int(level), index_in_level=int(index_in_level))
     else:
-        raise ValueError(f"Unknown search_state_type {search_state_type}")
+        raise ValueError(f"Unknown search_index_type {search_index_type}")
 
 
 def hash_divisor_sums(sums: List[RiemannDivisorSum]) -> str:
@@ -79,9 +79,9 @@ class SearchBlockState(Enum):
 
 @dataclass(frozen=True)
 class SearchMetadata:
-    starting_search_state: SearchState
-    ending_search_state: SearchState
-    search_state_type: str = "SuperabundantEnumerationIndex"
+    starting_search_index: SearchIndex
+    ending_search_index: SearchIndex
+    search_index_type: str = "SuperabundantEnumerationIndex"
     state: SearchBlockState = SearchBlockState.NOT_STARTED
     creation_time: datetime = field(default_factory=lambda: datetime.now())
     start_time: datetime = None
@@ -113,7 +113,7 @@ class SearchMetadata:
 
     def key(self):
         return (
-            self.search_state_type,
-            self.starting_search_state,
-            self.ending_search_state,
+            self.search_index_type,
+            self.starting_search_index,
+            self.ending_search_index,
         )

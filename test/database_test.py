@@ -100,15 +100,15 @@ class TestDatabase:
         metadata = [
             SearchMetadata(start_time=datetime(2020, 9, 1, 0, 0, 0),
                            end_time=datetime(2020, 9, 1, 1, 0, 0),
-                           search_state_type=name,
-                           starting_search_state=ExhaustiveSearchIndex(n=1),
-                           ending_search_state=ExhaustiveSearchIndex(n=2)),
+                           search_index_type=name,
+                           starting_search_index=ExhaustiveSearchIndex(n=1),
+                           ending_search_index=ExhaustiveSearchIndex(n=2)),
         ]
 
         db.insert_search_metadata(metadata[0])
         assert (
-            metadata[0].starting_search_state
-            == db.latest_search_metadata(name).starting_search_state
+            metadata[0].starting_search_index
+            == db.latest_search_metadata(name).starting_search_index
         )
 
     def test_store_metadata_ordering(self, db):
@@ -118,20 +118,20 @@ class TestDatabase:
         metadata = [
             SearchMetadata(start_time=older_time,
                            end_time=older_time,
-                           search_state_type=name,
-                           starting_search_state=ExhaustiveSearchIndex(n=1),
-                           ending_search_state=ExhaustiveSearchIndex(n=2)),
+                           search_index_type=name,
+                           starting_search_index=ExhaustiveSearchIndex(n=1),
+                           ending_search_index=ExhaustiveSearchIndex(n=2)),
             SearchMetadata(start_time=newer_time,
                            end_time=newer_time,
-                           search_state_type=name,
-                           starting_search_state=ExhaustiveSearchIndex(n=1),
-                           ending_search_state=ExhaustiveSearchIndex(n=2)),
+                           search_index_type=name,
+                           starting_search_index=ExhaustiveSearchIndex(n=1),
+                           ending_search_index=ExhaustiveSearchIndex(n=2)),
         ]
 
         # insert the newer one first
         db.insert_search_metadata(metadata[1])
         db.insert_search_metadata(metadata[0])
         assert (
-            metadata[1].starting_search_state
-            == db.latest_search_metadata(name).starting_search_state
+            metadata[1].starting_search_index
+            == db.latest_search_metadata(name).starting_search_index
         )

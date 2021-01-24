@@ -20,21 +20,21 @@ def test_search_strategy_uninitialized(make_strategy, expected_numbers_1,
     assert searched_numbers == set(expected_numbers_2)
 
 
-@pytest.mark.parametrize('make_strategy,search_state,expected_numbers', [
+@pytest.mark.parametrize('make_strategy,search_index,expected_numbers', [
     (ExhaustiveSearchStrategy, ExhaustiveSearchIndex(n=100), [100, 101]),
     (SuperabundantSearchStrategy,
      SuperabundantEnumerationIndex(level=5, index_in_level=1), [16 * 3, 8 * 9
                                                                 ]),
 ])
-def test_search_strategy_initialized(make_strategy, search_state,
+def test_search_strategy_initialized(make_strategy, search_index,
                                      expected_numbers):
-    search = make_strategy().starting_from(search_state)
+    search = make_strategy().starting_from(search_index)
     searched_numbers = set([x.n for x in search.next_batch(2)])
     assert searched_numbers == set(expected_numbers)
 
 
 @pytest.mark.parametrize(
-    'make_strategy,search_state,expected_ending_state',
+    'make_strategy,search_index,expected_ending_index',
     [(ExhaustiveSearchStrategy, ExhaustiveSearchIndex(n=100),
       ExhaustiveSearchIndex(n=102)),
      (SuperabundantSearchStrategy,
@@ -43,21 +43,21 @@ def test_search_strategy_initialized(make_strategy, search_state,
      (SuperabundantSearchStrategy,
       SuperabundantEnumerationIndex(level=4, index_in_level=4),
       SuperabundantEnumerationIndex(level=5, index_in_level=1))])
-def test_search_strategy_state(make_strategy, search_state,
-                               expected_ending_state):
-    search = make_strategy().starting_from(search_state)
-    assert search.search_state() == search_state
+def test_search_strategy_index(make_strategy, search_index,
+                               expected_ending_index):
+    search = make_strategy().starting_from(search_index)
+    assert search.search_index() == search_index
     search.next_batch(2)
-    assert search.search_state() == expected_ending_state
+    assert search.search_index() == expected_ending_index
 
 
 @pytest.mark.parametrize(
-    'make_strategy,search_state',
+    'make_strategy,search_index',
     [(ExhaustiveSearchStrategy, ExhaustiveSearchIndex(n=100)),
      (SuperabundantSearchStrategy,
       SuperabundantEnumerationIndex(level=5, index_in_level=1))])
-def test_search_state_reset(make_strategy, search_state):
-    search = make_strategy().starting_from(search_state)
+def test_search_index_reset(make_strategy, search_index):
+    search = make_strategy().starting_from(search_index)
     batch = search.next_batch(2)
-    batch_2 = search.starting_from(search_state).next_batch(2)
+    batch_2 = search.starting_from(search_index).next_batch(2)
     assert batch == batch_2

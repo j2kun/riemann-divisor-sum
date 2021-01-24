@@ -30,7 +30,7 @@ class DivisorDb(ABC):
         pass
 
     @abstractmethod
-    def claim_next_search_block(self, search_state_type: str) -> SearchMetadata:
+    def claim_next_search_block(self, search_index_type: str) -> SearchMetadata:
         '''Claim the next search block, and mark it as started.'''
         pass
 
