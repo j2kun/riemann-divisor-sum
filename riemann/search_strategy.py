@@ -23,13 +23,13 @@ class SearchStrategy(ABC):
         pass
 
     @abstractmethod
-    def search_index(self) -> SearchIndex:
-        '''Get an object describing the current state of the enumeration.'''
+    def generate_search_blocks(self, count: int, batch_size: int) -> List[SearchMetadata]:
+        '''Generate new search blocks to process.'''
         pass
 
     @abstractmethod
-    def next_batch(self, batch_size: int) -> List[RiemannDivisorSum]:
-        '''Process the next batch of Riemann Divisor Sums'''
+    def process_block(self, block: SearchMetadata) -> List[RiemannDivisorSum]:
+        '''Compute the Riemann divisor sums for the given block.'''
         pass
 
 
