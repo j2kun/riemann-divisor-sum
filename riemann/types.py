@@ -2,6 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from hashlib import sha256
 from typing import List
 from typing import Tuple
@@ -68,11 +69,19 @@ def hash_divisor_sums(sums: List[RiemannDivisorSum]) -> str:
     return sha256(bytes(hash_input, "utf-8")).hexdigest()
 
 
+class SearchBlockState(Enum):
+    NOT_STARTED = 1
+    IN_PROGRESS = 2
+    FINISHED = 3
+    FAILED = 4
+
+
 @dataclass(frozen=True)
 class SearchMetadata:
     start_time: datetime
     end_time: datetime
     search_state_type: str
+    state: SearchBlockState
     starting_search_state: SearchState
     ending_search_state: SearchState
 
