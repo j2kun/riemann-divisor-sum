@@ -71,6 +71,38 @@ def partitions_of_n(
 
 
 @njit
+def count_partitions_of_n(n: int) -> int:
+    '''Compute the number of partitions of n.'''
+    p = [0] * n
+    k = 0
+    count = 0
+    p[k] = n
+
+    while True:
+        count += 1
+
+        right_of_non_one = 0
+        while k >= 0 and p[k] == 1:
+            right_of_non_one += 1
+            k -= 1
+
+        if k < 0:
+            # partition is all 1s
+            break
+
+        p[k] -= 1
+        amount_to_split = right_of_non_one + 1
+        while amount_to_split > p[k]:
+            p[k + 1] = p[k]
+            amount_to_split -= p[k]
+            k += 1
+        p[k + 1] = amount_to_split
+        k += 1
+
+    return count
+
+
+@njit
 def partition_to_prime_factorization(
         partition: Partition) -> PrimeFactorization:
     return [(primes[i], exp) for (i, exp) in enumerate(partition)]
@@ -111,6 +143,7 @@ class CachedPartitionsOfN:
         self.n = n
         self.cache = None
         self.max_cache_size = max_cache_size
+        self.len = count_partitions_of_n(n=n)
 
     def _update_cache_starting_at(self, index):
         self.cache = dict(partitions_of_n(
@@ -124,3 +157,6 @@ class CachedPartitionsOfN:
             self._update_cache_starting_at(index)
 
         return self.cache[index]
+
+    def __len__(self):
+        return self.len

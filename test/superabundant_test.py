@@ -7,6 +7,7 @@ from hypothesis import settings
 from riemann.divisor import divisor_sum
 from riemann.primes import primes
 from riemann.superabundant import partitions_of_n
+from riemann.superabundant import count_partitions_of_n
 from riemann.superabundant import CachedPartitionsOfN
 from riemann.superabundant import prime_factor_divisor_sum
 
@@ -43,6 +44,11 @@ def test_partitions_of_n(test_input, expected):
 @pytest.mark.parametrize("test_input,expected", partition_count_pairs)
 def test_partitions_of_n_size(test_input, expected):
     assert len(partitions_of_n(test_input)) == expected
+
+
+@pytest.mark.parametrize("n", list(range(5, 20)))
+def test_count_partitions_of_n_size(n):
+    assert count_partitions_of_n(n) == len(partitions_of_n(n))
 
 
 def test_partitions_of_n_sublist_start():
