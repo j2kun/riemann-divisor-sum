@@ -8,8 +8,8 @@ from typing import List
 
 from riemann import divisor
 from riemann import superabundant
+from riemann.superabundant import CachedPartitionsOfN
 from riemann.superabundant import partition_to_prime_factorization
-from riemann.superabundant import partitions_of_n
 from riemann.types import ExhaustiveSearchIndex
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchState
@@ -47,6 +47,7 @@ def search_strategy_by_name(strategy_name):
 
 class ExhaustiveSearchStrategy(SearchStrategy):
     '''A search strategy that tries every positive integer starting from 5041.'''
+
     def __init__(self):
         self.search_index = 5041
 
@@ -69,6 +70,7 @@ class ExhaustiveSearchStrategy(SearchStrategy):
 
 class SuperabundantSearchStrategy(SearchStrategy):
     '''A search strategy that iterates over possibly superabundant numbers.'''
+
     def __init__(self):
         self.search_index = SuperabundantEnumerationIndex(level=1,
                                                           index_in_level=0)
@@ -116,4 +118,4 @@ class SuperabundantSearchStrategy(SearchStrategy):
     def __maybe_reset_current_level__(self):
         '''Idempotently compute the next level of the enumeration.'''
         if self.current_level[0] != self.search_index.level:
-            self.current_level = partitions_of_n(self.search_index.level)
+            self.current_level = CachedPartitionsOfN(n=self.search_index.level)
