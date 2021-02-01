@@ -156,6 +156,23 @@ class TestDatabase:
         assert len(stored) == 1
         assert stored[0].n == 2
 
+    def test_finish_search_block_hash_updated(self, db):
+        self.populate_search_blocks(db)
+        block = db.claim_next_search_block(
+            search_index_type='ExhaustiveSearchIndex')
+
+        records = [
+            RiemannDivisorSum(n=1, divisor_sum=1, witness_value=1),
+            RiemannDivisorSum(n=2, divisor_sum=2, witness_value=2),
+        ]
+
+        db.finish_search_block(block, records)
+        metadata = [
+            x for x in db.load_metadata()
+            if x.state == SearchBlockState.FINISHED
+        ][0]
+        assert metadata.block_hash != None
+
     def test_summarize_empty(self, db):
         expected = SummaryStats(largest_computed_n=None,
                                 largest_witness_value=None)

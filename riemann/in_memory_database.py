@@ -8,6 +8,7 @@ from riemann.types import RiemannDivisorSum
 from riemann.types import SearchBlockState
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
+from riemann.types import hash_divisor_sums
 
 
 class InMemoryDivisorDb(DivisorDb):
@@ -53,10 +54,12 @@ class InMemoryDivisorDb(DivisorDb):
 
     def finish_search_block(self, metadata: SearchMetadata,
                             divisor_sums: List[RiemannDivisorSum]) -> None:
+        block_hash = hash_divisor_sums(divisor_sums)
         block = replace(
             metadata,
             state=SearchBlockState.FINISHED,
             end_time=datetime.now(),
+            block_hash=block_hash,
         )
         self.metadata[block.key()] = block
         for divisor_sum in divisor_sums:

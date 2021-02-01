@@ -44,7 +44,7 @@ class DivisorDb(ABC):
                             metadata: SearchMetadata,
                             divisor_sums: List[RiemannDivisorSum]) -> None:
         '''
-        Mark a search block as finished, and insert the corresponding divisor
-        sums.
+        Mark a search block as finished, store its hash, and insert the
+        relevant subset of the corresponding divisor sums.
         '''
         pass
