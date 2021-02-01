@@ -2,6 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from hashlib import sha256
 from typing import List
 from typing import Tuple
 
@@ -60,6 +61,11 @@ def deserialize_search_state(search_state_type: str,
             level=int(level), index_in_level=int(index_in_level))
     else:
         raise ValueError(f"Unknown search_state_type {search_state_type}")
+
+
+def hash_divisor_sums(sums: List[RiemannDivisorSum]) -> str:
+    hash_input = ",".join(f"{rds.n},{rds.witness_value:5.4f}" for rds in sums) 
+    return sha256(bytes(hash_input, "utf-8")).hexdigest()
 
 
 @dataclass(frozen=True)
