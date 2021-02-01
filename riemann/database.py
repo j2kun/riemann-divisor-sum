@@ -9,6 +9,8 @@ from riemann.types import SummaryStats
 
 
 class DivisorDb(ABC):
+    THRESHOLD_WITNESS_VALUE = 1.767
+
     @abstractmethod
     def initialize_schema(self):
         '''Create the schema for a database, idempotently.'''

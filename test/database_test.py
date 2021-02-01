@@ -110,7 +110,7 @@ class TestDatabase:
         ]
 
         db.finish_search_block(block, records)
-        assert set(db.load()) == set(records)
+        assert len(db.load()) > 0
 
         next_block = db.claim_next_search_block(
             search_index_type='ExhaustiveSearchIndex')
@@ -172,6 +172,21 @@ class TestDatabase:
             if x.state == SearchBlockState.FINISHED
         ][0]
         assert metadata.block_hash != None
+
+    def test_finish_search_block_only_store_large_witness_values(self, db):
+        self.populate_search_blocks(db)
+        block = db.claim_next_search_block(
+            search_index_type='ExhaustiveSearchIndex')
+
+        records = [
+            RiemannDivisorSum(n=1, divisor_sum=1, witness_value=1),
+            RiemannDivisorSum(n=2, divisor_sum=2, witness_value=2),
+        ]
+
+        db.finish_search_block(block, records)
+        stored = db.load()
+        assert len(stored) == 1
+        assert stored[0].n == 2
 
     def test_summarize_empty(self, db):
         expected = SummaryStats(largest_computed_n=None,
