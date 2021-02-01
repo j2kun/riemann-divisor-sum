@@ -97,7 +97,7 @@ class TestDatabase:
             search_index_type='ExhaustiveSearchIndex')
         next_block = db.claim_next_search_block(
             search_index_type='ExhaustiveSearchIndex')
-        assert block != next_block
+        assert block.starting_search_index != next_block.starting_search_index
 
     def test_claim_and_finish_search_block(self, db):
         self.populate_search_blocks(db)
@@ -114,7 +114,7 @@ class TestDatabase:
 
         next_block = db.claim_next_search_block(
             search_index_type='ExhaustiveSearchIndex')
-        assert block != next_block
+        assert block.starting_search_index != next_block.starting_search_index
 
     def test_finish_search_block_timestamp_updated(self, db):
         self.populate_search_blocks(db)
