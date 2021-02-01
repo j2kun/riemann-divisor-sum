@@ -6,8 +6,10 @@ from riemann.postgres_database import PostgresDivisorDb
 from riemann.search_strategy import search_strategy_by_name
 from riemann.search_strategy import SearchStrategy
 from riemann.types import SearchMetadata
+from riemann.types import hash_divisor_sums
 
 DEFAULT_BATCH_SIZE = 250000
+THRESHOLD_WITNESS_VALUE = 1.767
 
 
 def search_strategy(divisorDb: DivisorDb,
@@ -39,18 +41,29 @@ def populate_db(divisorDb: DivisorDb,
     while True:
         start = datetime.now()
         start_state = search_strategy.search_state()
-        db.insert(search_strategy.next_batch(batch_size))
+        batch_results = search_strategy.next_batch(batch_size)
         end_state = search_strategy.search_state()
+
+        # Only save riemann sums above the threshold. All other values are
+        # dropped, and we store the hash of the witness values instead. To
+        # verify, one can recompute a block and comparing hashes.
+        db.insert([
+            x for x in batch_results
+            if x.witness_value > THRESHOLD_WITNESS_VALUE
+        ])
+        block_hash = hash_divisor_sums(batch_results)
         end = datetime.now()
         print(
             f"Computed [{start_state.serialize()}, {end_state.serialize()}] in {end-start}"
+            f" with hash {block_hash}"
         )
         divisorDb.insert_search_metadata(
             SearchMetadata(start_time=start,
                            end_time=end,
                            search_state_type=end_state.__class__.__name__,
                            starting_search_state=start_state,
-                           ending_search_state=end_state))
+                           ending_search_state=end_state,
+                           block_hash=block_hash))
 
 
 if __name__ == "__main__":

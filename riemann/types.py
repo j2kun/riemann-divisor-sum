@@ -2,6 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+from hashlib import sha256
 from typing import List
 from typing import Tuple
 
@@ -62,6 +63,11 @@ def deserialize_search_state(search_state_type: str,
         raise ValueError(f"Unknown search_state_type {search_state_type}")
 
 
+def hash_divisor_sums(sums: List[RiemannDivisorSum]) -> str:
+    hash_input = ",".join(f"{rds.n},{rds.witness_value:5.4f}" for rds in sums) 
+    return sha256(bytes(hash_input, "utf-8")).hexdigest()
+
+
 @dataclass(frozen=True)
 class SearchMetadata:
     start_time: datetime
@@ -69,3 +75,27 @@ class SearchMetadata:
     search_state_type: str
     starting_search_state: SearchState
     ending_search_state: SearchState
+
+    '''
+    The hexdigest of the SHA-256 hash of a string
+    representation of the witness values of this search block.
+    The field may be None if this value has not yet been
+    computed.
+    
+    The format for the string before hashing is
+
+    N_1,WITNESS_VALUE_1,N_2,WITNESS_VALUE_2,...
+
+    where WITNESS_VALUE_i formatted with %5.4f is the approximate witness value
+    for N_i.
+
+    Example, for a block starting with 10080 and ending with 10082, the string
+    before hashing is
+
+    10080,1.7558,100081,0.4775,10082,0.6849
+    
+    And the hash is 
+
+    d6062a3151b57f7a65401cbc41d94239ff150b374269d595d9280849d4e2123f
+    '''
+    block_hash: str = None

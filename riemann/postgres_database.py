@@ -42,7 +42,8 @@ class PostgresDivisorDb(DivisorDb):
             end_time timestamp,
             search_state_type TEXT,
             starting_search_state TEXT,
-            ending_search_state TEXT
+            ending_search_state TEXT,
+            block_hash CHAR(64)
         );''')
         self.connection.commit()
 
@@ -151,16 +152,20 @@ class PostgresDivisorDb(DivisorDb):
               end_time,
               search_state_type,
               starting_search_state,
-              ending_search_state
+              ending_search_state,
+              block_hash
             )
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s)
         '''
 
         cursor.execute(
-            cursor.mogrify(query, (metadata.start_time, metadata.end_time,
-                                   metadata.search_state_type,
-                                   metadata.starting_search_state.serialize(),
-                                   metadata.ending_search_state.serialize())))
+            cursor.mogrify(query, (
+                metadata.start_time,
+                metadata.end_time,
+                metadata.search_state_type,
+                metadata.starting_search_state.serialize(),
+                metadata.ending_search_state.serialize(),
+                metadata.block_hash)))
         self.connection.commit()
 
 
