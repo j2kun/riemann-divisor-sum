@@ -42,7 +42,7 @@ def db(request):
 
 DATABASES = [
     createInMemoryDb,
-    # createPostgresDb,
+    createPostgresDb,
 ]
 
 
