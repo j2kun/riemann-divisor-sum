@@ -6,6 +6,7 @@ from gmpy2 import mpz
 from riemann.database import DivisorDb
 from riemann.types import deserialize_search_index
 from riemann.types import RiemannDivisorSum
+from riemann.types import SearchBlockState
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
 
@@ -69,6 +70,21 @@ class PostgresDivisorDb(DivisorDb):
                               witness_value=row[2]) for row in rows
         ]
 
+    def convert_metadatas(self, rows):
+        return [
+            SearchMetadata(
+                starting_search_index=deserialize_search_index(row[2], row[0]),
+                ending_search_index=deserialize_search_index(row[2], row[1]),
+                search_index_type=row[2],
+                # indexing [ ] is Python's "name to enum" lookup
+                state=SearchBlockState[row[3]],
+                creation_time=row[4],
+                start_time=row[5],
+                end_time=row[6],
+                block_hash=row[7],
+            ) for row in rows
+        ]
+
     def load(self) -> List[RiemannDivisorSum]:
         cursor = self.connection.cursor()
         cursor.execute('''
@@ -77,6 +93,23 @@ class PostgresDivisorDb(DivisorDb):
             ORDER BY n asc;
         ''')
         return self.convert_records(cursor.fetchall())
+
+    def load_metadata(self) -> List[SearchMetadata]:
+        cursor = self.connection.cursor()
+        cursor.execute('''
+            SELECT
+              starting_search_index,
+              ending_search_index,
+              search_index_type,
+              state,
+              creation_time,
+              start_time,
+              end_time,
+              block_hash
+            FROM SearchMetadata
+            ORDER BY creation_time asc;
+        ''')
+        return self.convert_metadatas(cursor.fetchall())
 
     def insert(self, records: List[RiemannDivisorSum]) -> None:
         cursor = self.connection.cursor()
