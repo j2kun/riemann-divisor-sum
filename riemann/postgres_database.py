@@ -191,29 +191,45 @@ class PostgresDivisorDb(DivisorDb):
                 search_index_type, row[4]),
         )
 
-    def insert_search_metadata(self, metadata: SearchMetadata) -> None:
+    def insert_search_blocks(self, blocks: List[SearchMetadata]) -> None:
+        blocks_to_insert = [
+            replace(block, state=SearchBlockState.NOT_STARTED)
+            for block in blocks
+        ]
         cursor = self.connection.cursor()
         query = '''
         INSERT INTO
             SearchMetadata(
+              creation_time,
               start_time,
               end_time,
               search_index_type,
+              state,
               starting_search_index,
               ending_search_index,
               block_hash
             )
-            VALUES (%s, %s, %s, %s, %s, %s)
+            VALUES %s;
         '''
+        template = "(%s, %s, %s, %s, %s, %s, %s, %s)"
 
-        cursor.execute(
-            cursor.mogrify(query, (
-                metadata.start_time,
-                metadata.end_time,
-                metadata.search_index_type,
-                metadata.starting_search_index.serialize(),
-                metadata.ending_search_index.serialize(),
-                metadata.block_hash)))
+        arglist = [
+            (
+                block.creation_time,
+                block.start_time,
+                block.end_time,
+                block.search_index_type,
+                block.state.name,
+                block.starting_search_index.serialize(),
+                block.ending_search_index.serialize(),
+                block.block_hash
+            )
+            for block in blocks
+        ]
+        psycopg2.extras.execute_values(cur=cursor,
+                                       sql=query,
+                                       argslist=arglist,
+                                       template=template)
         self.connection.commit()
 
 
