@@ -113,57 +113,6 @@ class PostgresDivisorDb(DivisorDb):
         ''')
         return self.convert_metadatas(cursor.fetchall())
 
-    def finish_search_block(self,
-                            metadata: SearchMetadata,
-                            divisor_sums: List[RiemannDivisorSum]) -> None:
-        cursor = self.connection.cursor()
-        block_hash = hash_divisor_sums(divisor_sums)
-        metadata = replace(metadata, block_hash=block_hash)
-        query = '''
-        UPDATE SearchMetadata
-        SET
-          end_time = NOW(),
-          state = 'FINISHED',
-          block_hash = %s
-        WHERE
-          search_index_type = %s
-          AND starting_search_index = %s
-          AND ending_search_index = %s
-          AND state = 'IN_PROGRESS'
-        ;
-        '''
-
-        cursor.execute(
-            cursor.mogrify(query, (
-                metadata.block_hash,
-                metadata.search_index_type,
-                metadata.starting_search_index.serialize(),
-                metadata.ending_search_index.serialize())))
-
-        if cursor.rowcount <= 0:
-            self.connection.rollback()
-            raise ValueError(
-                f"The block was not found or not IN_PROGRESS! "
-                f"metadata={metadata}")
-
-        query = '''
-        INSERT INTO
-            RiemannDivisorSums(n, divisor_sum, witness_value)
-            VALUES %s;
-        '''
-        template = "(%s::mpz, %s::mpz, %s)"
-        arglist = [
-            ("%s" % d.n, "%s" % d.divisor_sum, float(d.witness_value))
-            for d in divisor_sums
-            if d.witness_value > self.THRESHOLD_WITNESS_VALUE
-        ]
-
-        psycopg2.extras.execute_values(cur=cursor,
-                                       sql=query,
-                                       argslist=arglist,
-                                       template=template)
-        self.connection.commit()
-
     def summarize(self) -> SummaryStats:
         cursor = self.connection.cursor()
         cursor.execute('''
@@ -196,6 +145,47 @@ class PostgresDivisorDb(DivisorDb):
 
         return SummaryStats(largest_computed_n=largest_n_record,
                             largest_witness_value=largest_witness_record)
+
+    def insert_search_blocks(self, blocks: List[SearchMetadata]) -> None:
+        blocks_to_insert = [
+            replace(block, state=SearchBlockState.NOT_STARTED)
+            for block in blocks
+        ]
+        cursor = self.connection.cursor()
+        query = '''
+        INSERT INTO
+            SearchMetadata(
+              creation_time,
+              start_time,
+              end_time,
+              search_index_type,
+              state,
+              starting_search_index,
+              ending_search_index,
+              block_hash
+            )
+            VALUES %s;
+        '''
+        template = "(%s, %s, %s, %s, %s, %s, %s, %s)"
+
+        arglist = [
+            (
+                block.creation_time,
+                block.start_time,
+                block.end_time,
+                block.search_index_type,
+                block.state.name,
+                block.starting_search_index.serialize(),
+                block.ending_search_index.serialize(),
+                block.block_hash
+            )
+            for block in blocks
+        ]
+        psycopg2.extras.execute_values(cur=cursor,
+                                       sql=query,
+                                       argslist=arglist,
+                                       template=template)
+        self.connection.commit()
 
     def claim_next_search_block(
         self,
@@ -250,41 +240,51 @@ class PostgresDivisorDb(DivisorDb):
             state=SearchBlockState[row[4]],
         )
 
-    def insert_search_blocks(self, blocks: List[SearchMetadata]) -> None:
-        blocks_to_insert = [
-            replace(block, state=SearchBlockState.NOT_STARTED)
-            for block in blocks
-        ]
+    def finish_search_block(self,
+                            metadata: SearchMetadata,
+                            divisor_sums: List[RiemannDivisorSum]) -> None:
         cursor = self.connection.cursor()
+        block_hash = hash_divisor_sums(divisor_sums)
+        metadata = replace(metadata, block_hash=block_hash)
+        query = '''
+        UPDATE SearchMetadata
+        SET
+          end_time = NOW(),
+          state = 'FINISHED',
+          block_hash = %s
+        WHERE
+          search_index_type = %s
+          AND starting_search_index = %s
+          AND ending_search_index = %s
+          AND state = 'IN_PROGRESS'
+        ;
+        '''
+
+        cursor.execute(
+            cursor.mogrify(query, (
+                metadata.block_hash,
+                metadata.search_index_type,
+                metadata.starting_search_index.serialize(),
+                metadata.ending_search_index.serialize())))
+
+        if cursor.rowcount <= 0:
+            self.connection.rollback()
+            raise ValueError(
+                f"The block was not found or not IN_PROGRESS! "
+                f"metadata={metadata}")
+
         query = '''
         INSERT INTO
-            SearchMetadata(
-              creation_time,
-              start_time,
-              end_time,
-              search_index_type,
-              state,
-              starting_search_index,
-              ending_search_index,
-              block_hash
-            )
+            RiemannDivisorSums(n, divisor_sum, witness_value)
             VALUES %s;
         '''
-        template = "(%s, %s, %s, %s, %s, %s, %s, %s)"
-
+        template = "(%s::mpz, %s::mpz, %s)"
         arglist = [
-            (
-                block.creation_time,
-                block.start_time,
-                block.end_time,
-                block.search_index_type,
-                block.state.name,
-                block.starting_search_index.serialize(),
-                block.ending_search_index.serialize(),
-                block.block_hash
-            )
-            for block in blocks
+            ("%s" % d.n, "%s" % d.divisor_sum, float(d.witness_value))
+            for d in divisor_sums
+            if d.witness_value > self.THRESHOLD_WITNESS_VALUE
         ]
+
         psycopg2.extras.execute_values(cur=cursor,
                                        sql=query,
                                        argslist=arglist,
