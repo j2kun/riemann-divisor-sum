@@ -31,6 +31,14 @@ class PostgresDivisorDb(DivisorDb):
         CREATE EXTENSION IF NOT EXISTS pgmp;
         ''')
         cursor.execute('''
+        CREATE TYPE SearchBlockState AS ENUM (
+          'NOT_STARTED',
+          'IN_PROGRESS',
+          'FINISHED',
+          'FAILED'
+        );
+        ''')
+        cursor.execute('''
         CREATE TABLE IF NOT EXISTS RiemannDivisorSums (
             n mpz,
             divisor_sum mpz,
@@ -38,12 +46,19 @@ class PostgresDivisorDb(DivisorDb):
         );''')
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS SearchMetadata (
+            creation_time timestamp,
             start_time timestamp,
             end_time timestamp,
             search_index_type TEXT,
+            state SearchBlockState,
             starting_search_index TEXT,
             ending_search_index TEXT,
-            block_hash CHAR(64)
+            block_hash CHAR(64),
+            UNIQUE (
+                search_index_type,
+                starting_search_index,
+                ending_search_index
+            )
         );''')
         self.connection.commit()
 
