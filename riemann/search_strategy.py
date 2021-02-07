@@ -21,6 +21,11 @@ from riemann.types import SuperabundantEnumerationIndex
 
 class SearchStrategy(ABC):
     @abstractmethod
+    def index_name(self) -> str:
+        '''The name of the SearchIndex subclass used with this strategy.'''
+        pass
+
+    @abstractmethod
     def starting_from(self, search_index: SearchIndex) -> SearchStrategy:
         '''Reset the search strategy to search from a given state.'''
         pass
@@ -53,6 +58,7 @@ class ExhaustiveSearchStrategy(SearchStrategy):
 
     def __init__(self):
         self._search_index = ExhaustiveSearchIndex(n=5041)
+        self._index_name = self._search_index.__class__.__name__
 
     def starting_from(
             self,
@@ -70,22 +76,29 @@ class ExhaustiveSearchStrategy(SearchStrategy):
             blocks.append(SearchMetadata(
                 starting_search_index=starting_index,
                 ending_search_index=ending_index,
-                search_index_type='ExhaustiveSearchIndex',
+                search_index_type=self.index_name(),
             ))
         return blocks
 
     def process_block(self, block: SearchMetadata) -> List[RiemannDivisorSum]:
         return divisor.compute_riemann_divisor_sums(block.starting_search_index.n, block.ending_search_index.n)
 
+    def index_name(self) -> str:
+        return self._index_name
+
 
 class SuperabundantSearchStrategy(SearchStrategy):
     '''A search strategy that iterates over possibly superabundant numbers.'''
 
     def __init__(self):
-        self._search_index = SuperabundantEnumerationIndex(level=1,
-                                                           index_in_level=0)
+        self._search_index = SuperabundantEnumerationIndex(
+            level=1, index_in_level=0)
         self.current_level = [[1]]
         self.__maybe_reset_current_level__()
+        self._index_name = self._search_index.__class__.__name__
+
+    def index_name(self) -> str:
+        return self._index_name
 
     def starting_from(
         self, search_index: SuperabundantEnumerationIndex
@@ -158,4 +171,5 @@ class SuperabundantSearchStrategy(SearchStrategy):
     def __maybe_reset_current_level__(self):
         '''Idempotently compute the next level of the enumeration.'''
         if self.current_level[0] != self._search_index.level:
-            self.current_level = CachedPartitionsOfN(n=self._search_index.level)
+            self.current_level = CachedPartitionsOfN(
+                n=self._search_index.level)
