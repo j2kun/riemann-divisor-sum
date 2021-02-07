@@ -1,5 +1,6 @@
 from typing import List
 from typing import Union
+from dataclasses import replace
 
 import psycopg2.extras
 from gmpy2 import mpz
@@ -9,6 +10,7 @@ from riemann.types import RiemannDivisorSum
 from riemann.types import SearchBlockState
 from riemann.types import SearchMetadata
 from riemann.types import SummaryStats
+from riemann.types import hash_divisor_sums
 
 DEFAULT_DATA_SOURCE_NAME = 'dbname=divisor'
 
@@ -111,16 +113,50 @@ class PostgresDivisorDb(DivisorDb):
         ''')
         return self.convert_metadatas(cursor.fetchall())
 
-    def insert(self, records: List[RiemannDivisorSum]) -> None:
+    def finish_search_block(self,
+                            metadata: SearchMetadata,
+                            divisor_sums: List[RiemannDivisorSum]) -> None:
         cursor = self.connection.cursor()
+        block_hash = hash_divisor_sums(divisor_sums)
+        metadata = replace(metadata, block_hash=block_hash)
+        query = '''
+        UPDATE SearchMetadata
+        SET
+          end_time = NOW(),
+          state = 'FINISHED',
+          block_hash = %s
+        WHERE
+          search_index_type = %s
+          AND starting_search_index = %s
+          AND ending_search_index = %s
+          AND state = 'IN_PROGRESS'
+        ;
+        '''
+
+        cursor.execute(
+            cursor.mogrify(query, (
+                metadata.block_hash,
+                metadata.search_index_type,
+                metadata.starting_search_index.serialize(),
+                metadata.ending_search_index.serialize())))
+
+        if cursor.rowcount <= 0:
+            self.connection.rollback()
+            raise ValueError(
+                f"The block was not found or not IN_PROGRESS! "
+                f"metadata={metadata}")
+
         query = '''
         INSERT INTO
             RiemannDivisorSums(n, divisor_sum, witness_value)
             VALUES %s;
         '''
         template = "(%s::mpz, %s::mpz, %s)"
-        arglist = [("%s" % record.n, "%s" % record.divisor_sum,
-                    float(record.witness_value)) for record in records]
+        arglist = [
+            ("%s" % d.n, "%s" % d.divisor_sum, float(d.witness_value))
+            for d in divisor_sums
+            if d.witness_value > self.THRESHOLD_WITNESS_VALUE
+        ]
 
         psycopg2.extras.execute_values(cur=cursor,
                                        sql=query,
