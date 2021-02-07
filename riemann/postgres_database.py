@@ -161,34 +161,57 @@ class PostgresDivisorDb(DivisorDb):
         return SummaryStats(largest_computed_n=largest_n_record,
                             largest_witness_value=largest_witness_record)
 
-    def latest_search_metadata(
-            self, search_index_type: str) -> Union[SearchMetadata, None]:
+    def claim_next_search_block(
+        self,
+        search_index_type: str
+    ) -> Union[SearchMetadata, None]:
         cursor = self.connection.cursor()
+        # FOR UPDATE locks the row for the duration of the query.
+        # Cf. https://stackoverflow.com/q/11532550/438830
         cursor.execute('''
-            SELECT
-              start_time,
-              end_time,
-              search_index_type,
-              starting_search_index,
-              ending_search_index
-            FROM SearchMetadata
-            WHERE search_index_type = '%s'
-            ORDER BY end_time DESC
-            LIMIT 1;
+            UPDATE SearchMetadata
+            SET
+              start_time = NOW(),
+              state = 'IN_PROGRESS'
+            FROM (
+                SELECT
+                    search_index_type,
+                    starting_search_index,
+                    ending_search_index
+                FROM SearchMetadata
+                WHERE
+                  search_index_type='%s'
+                  AND (state = 'NOT_STARTED' OR state = 'FAILED')
+                ORDER BY creation_time ASC
+                LIMIT 1
+                FOR UPDATE
+            ) as m
+            WHERE
+              SearchMetadata.search_index_type = m.search_index_type
+              AND SearchMetadata.starting_search_index = m.starting_search_index
+              AND SearchMetadata.ending_search_index = m.ending_search_index
+            RETURNING
+              SearchMetadata.starting_search_index,
+              SearchMetadata.ending_search_index,
+              SearchMetadata.search_index_type,
+              SearchMetadata.start_time,
+              SearchMetadata.state
+            ;
         ''' % search_index_type)
 
         row = cursor.fetchone()
         if not row:
-            return None
+            raise ValueError('No legal search block to claim')
 
         return SearchMetadata(
-            start_time=row[0],
-            end_time=row[1],
-            search_index_type=row[2],
             starting_search_index=deserialize_search_index(
-                search_index_type, row[3]),
+                search_index_type, row[0]),
             ending_search_index=deserialize_search_index(
-                search_index_type, row[4]),
+                search_index_type, row[1]),
+            search_index_type=row[2],
+            start_time=row[3],
+            # indexing [ ] is Python's "name to enum" lookup
+            state=SearchBlockState[row[4]],
         )
 
     def insert_search_blocks(self, blocks: List[SearchMetadata]) -> None:
