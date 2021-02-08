@@ -2,8 +2,8 @@
 
 set -euf -o pipefail
 
-docker build -t divisordb -f divisordb.Dockerfile .
-docker build -t divisorsearch -f divisorsearch.Dockerfile .
+docker build -t divisordb -f docker/divisordb.Dockerfile .
+docker build -t divisorsearch -f docker/divisorsearch.Dockerfile .
 
 docker run -d --name divisordb -p 5432:5432 --memory="1G" divisordb:latest
 
