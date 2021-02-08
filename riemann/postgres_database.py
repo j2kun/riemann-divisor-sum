@@ -196,6 +196,7 @@ class PostgresDivisorDb(DivisorDb):
         cursor = self.connection.cursor()
         # FOR UPDATE locks the row for the duration of the query.
         # Cf. https://stackoverflow.com/q/11532550/438830
+        # and test_multiple_processors_no_duplicates
         cursor.execute('''
             UPDATE SearchMetadata
             SET
@@ -227,9 +228,9 @@ class PostgresDivisorDb(DivisorDb):
             ;
         ''' % search_index_type)
 
-        row = cursor.fetchone()
-        if not row:
+        if cursor.rowcount <= 0:
             raise ValueError('No legal search block to claim')
+        row = cursor.fetchone()
 
         return SearchMetadata(
             starting_search_index=deserialize_search_index(
@@ -284,7 +285,7 @@ class PostgresDivisorDb(DivisorDb):
         arglist = [
             ("%s" % d.n, "%s" % d.divisor_sum, float(d.witness_value))
             for d in divisor_sums
-            if d.witness_value > self.THRESHOLD_WITNESS_VALUE
+            if d.witness_value > self.threshold_witness_value
         ]
 
         psycopg2.extras.execute_values(cur=cursor,

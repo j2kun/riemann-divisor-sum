@@ -63,7 +63,7 @@ class InMemoryDivisorDb(DivisorDb):
         )
         self.metadata[block.key()] = block
         for divisor_sum in divisor_sums:
-            if divisor_sum.witness_value > self.THRESHOLD_WITNESS_VALUE:
+            if divisor_sum.witness_value > self.threshold_witness_value:
                 self.data[divisor_sum.n] = divisor_sum
 
     def summarize(self) -> SummaryStats:
