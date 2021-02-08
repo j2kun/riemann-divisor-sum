@@ -38,7 +38,7 @@ class SearchIndex(ABC):
 
 @dataclass(frozen=True)
 class ExhaustiveSearchIndex(SearchIndex):
-    n: int
+    n: int = 1
 
     def serialize(self) -> str:
         return str(self.n)
@@ -46,11 +46,21 @@ class ExhaustiveSearchIndex(SearchIndex):
 
 @dataclass(frozen=True)
 class SuperabundantEnumerationIndex(SearchIndex):
-    level: int
-    index_in_level: int
+    level: int = 1
+    index_in_level: int = 0
 
     def serialize(self) -> str:
         return f"{self.level},{self.index_in_level}"
+
+
+INDEX_CLASS_LOOKUP = dict(
+    ExhaustiveSearchIndex=ExhaustiveSearchIndex,
+    SuperabundantEnumerationIndex=SuperabundantEnumerationIndex,
+)
+
+
+def index_name_to_class(name):
+    return INDEX_CLASS_LOOKUP[name]
 
 
 def deserialize_search_index(search_index_type: str,
@@ -66,7 +76,7 @@ def deserialize_search_index(search_index_type: str,
 
 
 def hash_divisor_sums(sums: List[RiemannDivisorSum]) -> str:
-    hash_input = ",".join(f"{rds.n},{rds.witness_value:5.4f}" for rds in sums) 
+    hash_input = ",".join(f"{rds.n},{rds.witness_value:5.4f}" for rds in sums)
     return sha256(bytes(hash_input, "utf-8")).hexdigest()
 
 
