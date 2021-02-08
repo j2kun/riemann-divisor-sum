@@ -63,6 +63,9 @@ class TestDatabase:
             db.claim_next_search_block(
                 search_index_type='ExhaustiveSearchIndex')
 
+    def test_empty_metadata(self, db):
+        assert len(db.load_metadata()) == 0
+
     def test_insert_search_block(self, db):
         metadata = SearchMetadata(
             search_index_type='ExhaustiveSearchIndex',

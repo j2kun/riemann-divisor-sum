@@ -111,6 +111,8 @@ class PostgresDivisorDb(DivisorDb):
             FROM SearchMetadata
             ORDER BY creation_time asc;
         ''')
+        if cursor.rowcount <= 0:
+            return []
         return self.convert_metadatas(cursor.fetchall())
 
     def summarize(self) -> SummaryStats:
