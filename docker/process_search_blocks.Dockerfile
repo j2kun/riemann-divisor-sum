@@ -18,4 +18,4 @@ ENV PGUSER=docker
 ENV PGPASSWORD=docker
 ENV PGDATABASE=divisor
 
-ENTRYPOINT ["python3", "-m", "riemann.populate_database"]
+ENTRYPOINT ["python3", "-m", "riemann.process_search_blocks"]
