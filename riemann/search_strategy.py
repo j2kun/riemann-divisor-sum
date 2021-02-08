@@ -40,6 +40,14 @@ class SearchStrategy(ABC):
         '''Compute the Riemann divisor sums for the given block.'''
         pass
 
+    @abstractmethod
+    def max(self, blocks: List[SearchIndex]) -> SearchIndex:
+        '''
+        Compute the "max" search block, according to the
+        enumeration defined by the search strategy.
+        '''
+        pass
+
 
 def search_strategy_by_name(strategy_name):
     lookup = {
@@ -59,6 +67,9 @@ class ExhaustiveSearchStrategy(SearchStrategy):
     def __init__(self):
         self._search_index = ExhaustiveSearchIndex(n=5041)
         self._index_name = self._search_index.__class__.__name__
+
+    def max(self, blocks: List[ExhaustiveSearchIndex]) -> ExhaustiveSearchIndex:
+        return max(blocks, key=lambda index: index.n)
 
     def starting_from(
             self,
@@ -99,6 +110,15 @@ class SuperabundantSearchStrategy(SearchStrategy):
 
     def index_name(self) -> str:
         return self._index_name
+
+    def max(self, blocks: List[SuperabundantEnumerationIndex]) -> SuperabundantEnumerationIndex:
+        return max(
+            blocks,
+            key=lambda index: (
+                index.level,
+                index.index_in_level
+            )
+        )
 
     def starting_from(
         self, search_index: SuperabundantEnumerationIndex
