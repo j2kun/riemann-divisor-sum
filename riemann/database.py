@@ -9,6 +9,8 @@ from riemann.types import SummaryStats
 
 
 class DivisorDb(ABC):
+    threshold_witness_value = 1.767
+
     @abstractmethod
     def initialize_schema(self):
         '''Create the schema for a database, idempotently.'''
@@ -16,12 +18,12 @@ class DivisorDb(ABC):
 
     @abstractmethod
     def load(self) -> List[RiemannDivisorSum]:
-        '''Load the entire database.'''
+        '''Load the entire database of Riemann divisor sums.'''
         pass
 
     @abstractmethod
-    def insert(self, data: List[RiemannDivisorSum]) -> None:
-        '''Insert or update the given list of data points.'''
+    def load_metadata(self) -> List[SearchMetadata]:
+        '''Load the entire database of Metadata records.'''
         pass
 
     @abstractmethod
@@ -30,9 +32,21 @@ class DivisorDb(ABC):
         pass
 
     @abstractmethod
-    def latest_search_metadata(self, search_state_type: str) -> SearchMetadata:
+    def insert_search_blocks(self, blocks: List[SearchMetadata]) -> None:
+        '''Insert new search blocks, and mark them as not started.'''
         pass
 
     @abstractmethod
-    def insert_search_metadata(self, metadata: SearchMetadata) -> None:
+    def claim_next_search_block(self, search_index_type: str) -> SearchMetadata:
+        '''Claim the next search block, and mark it as started.'''
+        pass
+
+    @abstractmethod
+    def finish_search_block(self,
+                            metadata: SearchMetadata,
+                            divisor_sums: List[RiemannDivisorSum]) -> None:
+        '''
+        Mark a search block as finished, store its hash, and insert the
+        relevant subset of the corresponding divisor sums.
+        '''
         pass
