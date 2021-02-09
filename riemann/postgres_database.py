@@ -231,6 +231,7 @@ class PostgresDivisorDb(DivisorDb):
         if cursor.rowcount <= 0:
             raise ValueError('No legal search block to claim')
         row = cursor.fetchone()
+        self.connection.commit()
 
         return SearchMetadata(
             starting_search_index=deserialize_search_index(
