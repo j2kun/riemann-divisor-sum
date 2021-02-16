@@ -66,6 +66,10 @@ class InMemoryDivisorDb(DivisorDb):
             if divisor_sum.witness_value > self.threshold_witness_value:
                 self.data[divisor_sum.n] = divisor_sum
 
+    def mark_block_as_failed(self, metadata: SearchMetadata) -> None:
+        block = replace(metadata, state=SearchBlockState.FAILED)
+        self.metadata[block.key()] = block
+
     def summarize(self) -> SummaryStats:
         if not self.data:
             return SummaryStats(largest_computed_n=None,
