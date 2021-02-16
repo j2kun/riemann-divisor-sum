@@ -16,24 +16,35 @@ def claim_and_compute_one_block(
         divisorDb: DivisorDb,
         search_strategy: SearchStrategy) -> None:
     '''Claim and compute a single search block.'''
+    start = datetime.now()
+
     try:
-        start = datetime.now()
         block = divisorDb.claim_next_search_block(search_strategy.index_name())
-        divisor_sums = search_strategy.process_block(block)
-        divisorDb.finish_search_block(block, divisor_sums)
-        end = datetime.now()
+    except Exception as e:
         print(
-            f"Computed and saved ["
-            f"{block.starting_search_index.serialize()}, "
-            f"{block.ending_search_index.serialize()}] "
-            f"in {end-start}"
-        )
-    except ValueError as e:
-        print(
-            f"Failed to claim or process search block.\n"
+            f"Failed to claim search block.\n"
             f"Error was: {e}"
         )
         raise e
+
+    try:
+        divisor_sums = search_strategy.process_block(block)
+        divisorDb.finish_search_block(block, divisor_sums)
+    except Exception as e:
+        print(
+            f"Failed to process or finish search block.\n"
+            f"Error was: {e}"
+        )
+        divisorDb.mark_block_as_failed(block)
+        raise e
+
+    end = datetime.now()
+    print(
+        f"Computed and saved ["
+        f"{block.starting_search_index.serialize()}, "
+        f"{block.ending_search_index.serialize()}] "
+        f"in {end-start}"
+    )
 
 
 def main(
