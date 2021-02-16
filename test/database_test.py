@@ -191,6 +191,18 @@ class TestDatabase:
         assert len(stored) == 1
         assert stored[0].n == 2
 
+    def test_mark_in_progress_as_failed(self, db):
+        self.populate_search_blocks(db)
+        block = db.claim_next_search_block(
+            search_index_type='ExhaustiveSearchIndex')
+
+        db.mark_block_as_failed(block)
+        metadata = [
+            x for x in db.load_metadata()
+            if x.starting_search_index == block.starting_search_index
+        ][0]
+        assert metadata.state == SearchBlockState.FAILED
+
     def test_summarize_empty(self, db):
         expected = SummaryStats(largest_computed_n=None,
                                 largest_witness_value=None)
