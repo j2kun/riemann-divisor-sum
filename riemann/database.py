@@ -50,3 +50,8 @@ class DivisorDb(ABC):
         relevant subset of the corresponding divisor sums.
         '''
         pass
+
+    @abstractmethod
+    def mark_block_as_failed(self, metadata: SearchMetadata) -> None:
+        '''Mark a search block as failed.'''
+        pass

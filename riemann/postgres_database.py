@@ -295,6 +295,26 @@ class PostgresDivisorDb(DivisorDb):
                                        template=template)
         self.connection.commit()
 
+    def mark_block_as_failed(self, metadata: SearchMetadata) -> None:
+        cursor = self.connection.cursor()
+        query = '''
+        UPDATE SearchMetadata
+        SET
+          state = 'FAILED'
+        WHERE
+          search_index_type = %s
+          AND starting_search_index = %s
+          AND ending_search_index = %s
+        ;
+        '''
+
+        cursor.execute(
+            cursor.mogrify(query, (
+                metadata.search_index_type,
+                metadata.starting_search_index.serialize(),
+                metadata.ending_search_index.serialize())))
+        self.connection.commit()
+
 
 if __name__ == "__main__":
     import sys
