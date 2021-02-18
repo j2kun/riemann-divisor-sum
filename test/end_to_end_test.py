@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import timedelta
 from multiprocessing import Pool
 from multiprocessing import Process
 from typing import List
@@ -6,6 +7,7 @@ import pytest
 import testing.postgresql
 import time
 
+from riemann import cleanup_stale_blocks
 from riemann import generate_search_blocks
 from riemann import process_search_blocks
 from riemann.database import DivisorDb
@@ -192,3 +194,51 @@ def test_mark_blocks_failed_when_block_computation_errs(db_factory):
     failed_blocks = [x for x in metadatas if x.state ==
                      SearchBlockState.FAILED]
     assert len(failed_blocks) > 0
+
+
+def test_mark_stale_blocks_failed(db_factory):
+    db = db_factory()
+
+    def run_generator():
+        generate_search_blocks.main(
+            db_factory(),
+            search_strategy=SuperabundantSearchStrategy(),
+            args=FakeArgs()
+        )
+
+    def slow_process_fn():
+        time.sleep(100)
+
+    def run_processor():
+        process_search_blocks.main(
+            db_factory(),
+            search_strategy=make_processor_test_strategy(slow_process_fn)
+        )
+
+    def run_cleanup():
+        cleanup_stale_blocks.main(
+            db_factory(),
+            refresh_period_seconds=1,
+            staleness_duration=timedelta(seconds=2)
+        )
+
+    p1 = Process(target=run_generator)
+    p1.start()
+    p2 = Process(target=run_cleanup)
+    p2.start()
+    time.sleep(5)
+    p3 = Process(target=run_processor)
+    p3.start()
+    time.sleep(5)
+    p1.terminate()
+    p2.terminate()
+    p3.terminate()
+    time.sleep(5)
+    p1.close()
+    p2.close()
+    p3.close()
+
+    metadatas = db.load_metadata()
+    failed_blocks = [x for x in metadatas if x.state ==
+                     SearchBlockState.FAILED]
+    assert len(failed_blocks) == 1
