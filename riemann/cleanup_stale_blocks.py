@@ -76,5 +76,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     db = PostgresDivisorDb(data_source_name=args.data_source_name)
-    args.staleness_duration = timedelta(hours=args.stale_threshold_hours)
-    main(db, args)
+    main(
+        db,
+        refresh_period_seconds=args.refresh_period_seconds,
+        staleness_duration=timedelta(hours=args.stale_threshold_hours)
+    )
