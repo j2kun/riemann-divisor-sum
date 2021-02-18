@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import timedelta
 from multiprocessing import Pool
 from multiprocessing import Process
 from typing import List
@@ -6,6 +7,7 @@ import pytest
 import testing.postgresql
 import time
 
+from riemann import cleanup_stale_blocks
 from riemann import generate_search_blocks
 from riemann import process_search_blocks
 from riemann.database import DivisorDb
@@ -35,6 +37,26 @@ class FakeArgs:
     refresh_threshold: int = 3
     block_size: int = 1000
     refresh_period_seconds: int = 3
+
+
+def make_processor_test_strategy(process_block_fn):
+    class TestStrategy(SearchStrategy):
+        def index_name(self) -> str:
+            return SuperabundantSearchStrategy().index_name()
+
+        def starting_from(self, search_index: SearchIndex) -> SearchStrategy:
+            return self
+
+        def generate_search_blocks(self, count: int, batch_size: int) -> List[SearchMetadata]:
+            raise Exception('Failing for a test!')
+
+        def process_block(self, block: SearchMetadata) -> List[RiemannDivisorSum]:
+            process_block_fn()
+
+        def max(self, blocks: List[SearchIndex]) -> SearchIndex:
+            raise Exception('Failing for a test!')
+
+    return TestStrategy()
 
 
 def test_generate_and_process_blocks_no_duplicates(db_factory):
@@ -147,25 +169,14 @@ def test_mark_blocks_failed_when_block_computation_errs(db_factory):
             args=FakeArgs()
         )
 
-    class ErringSearchStrategy(SearchStrategy):
-        def index_name(self) -> str:
-            return SuperabundantSearchStrategy().index_name()
-
-        def starting_from(self, search_index: SearchIndex) -> SearchStrategy:
-            return self
-
-        def generate_search_blocks(self, count: int, batch_size: int) -> List[SearchMetadata]:
-            raise Exception('Failing for a test!')
-
-        def process_block(self, block: SearchMetadata) -> List[RiemannDivisorSum]:
-            raise Exception('Failing for a test!')
-
-        def max(self, blocks: List[SearchIndex]) -> SearchIndex:
-            raise Exception('Failing for a test!')
+    def raise_fn():
+        raise Exception('Failing for a test!')
 
     def run_processor():
         process_search_blocks.main(
-            db_factory(), search_strategy=ErringSearchStrategy())
+            db_factory(),
+            search_strategy=make_processor_test_strategy(raise_fn)
+        )
 
     p1 = Process(target=run_generator)
     p1.start()
@@ -180,5 +191,54 @@ def test_mark_blocks_failed_when_block_computation_errs(db_factory):
     p2.close()
 
     metadatas = db.load_metadata()
-    failed_blocks = [x for x in metadatas if x.state == SearchBlockState.FAILED]
+    failed_blocks = [x for x in metadatas if x.state ==
+                     SearchBlockState.FAILED]
     assert len(failed_blocks) > 0
+
+
+def test_mark_stale_blocks_failed(db_factory):
+    db = db_factory()
+
+    def run_generator():
+        generate_search_blocks.main(
+            db_factory(),
+            search_strategy=SuperabundantSearchStrategy(),
+            args=FakeArgs()
+        )
+
+    def slow_process_fn():
+        time.sleep(100)
+
+    def run_processor():
+        process_search_blocks.main(
+            db_factory(),
+            search_strategy=make_processor_test_strategy(slow_process_fn)
+        )
+
+    def run_cleanup():
+        cleanup_stale_blocks.main(
+            db_factory(),
+            refresh_period_seconds=1,
+            staleness_duration=timedelta(seconds=2)
+        )
+
+    p1 = Process(target=run_generator)
+    p1.start()
+    p2 = Process(target=run_cleanup)
+    p2.start()
+    time.sleep(5)
+    p3 = Process(target=run_processor)
+    p3.start()
+    time.sleep(5)
+    p1.terminate()
+    p2.terminate()
+    p3.terminate()
+    time.sleep(5)
+    p1.close()
+    p2.close()
+    p3.close()
+
+    metadatas = db.load_metadata()
+    failed_blocks = [x for x in metadatas if x.state ==
+                     SearchBlockState.FAILED]
+    assert len(failed_blocks) == 1
