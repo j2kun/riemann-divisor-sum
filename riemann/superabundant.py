@@ -1,8 +1,8 @@
 from functools import reduce
 from typing import List
 from typing import Tuple
-import math
 
+from gmpy2 import log
 from gmpy2 import mpz
 from numba import njit
 from riemann.primes import primes
@@ -126,7 +126,7 @@ def compute_riemann_divisor_sum(
     '''Compute a divisor sum.'''
     n = reduce(lambda x, y: x * y, (mpz(p)**a for (p, a) in factorization))
     ds = prime_factor_divisor_sum(factorization)
-    wv = ds / (n * math.log(math.log(n)))
+    wv = ds / (n * log(log(n)))
     return RiemannDivisorSum(n=n, divisor_sum=ds, witness_value=wv)
 
 
