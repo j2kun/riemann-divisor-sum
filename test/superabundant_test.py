@@ -1,15 +1,17 @@
 from functools import reduce
 
-import hypothesis.strategies as st
-import pytest
 from hypothesis import given
 from hypothesis import settings
 from riemann.divisor import divisor_sum
 from riemann.primes import primes
-from riemann.superabundant import partitions_of_n
-from riemann.superabundant import count_partitions_of_n
 from riemann.superabundant import CachedPartitionsOfN
+from riemann.superabundant import compute_riemann_divisor_sum
+from riemann.superabundant import count_partitions_of_n
+from riemann.superabundant import partition_to_prime_factorization
+from riemann.superabundant import partitions_of_n
 from riemann.superabundant import prime_factor_divisor_sum
+import hypothesis.strategies as st
+import pytest
 
 expected_partitions = [
     list(enumerate([[1]])),
@@ -116,3 +118,15 @@ def test_prime_factor_divisor_sum(prime_factorization):
 
 def test_prime_factor_divisor_sum_2():
     assert prime_factor_divisor_sum([(2, 1)]) == divisor_sum(2)
+
+
+def test_mpz_too_large_to_convert_to_float():
+    # Regression test for issues/14
+    partitions = CachedPartitionsOfN(n=110)
+    n = len(partitions)
+    for i in range(n - 1000, n):
+        factorization = partition_to_prime_factorization(partitions[i])
+        divisor_sum = compute_riemann_divisor_sum(factorization)
+
+    # no assertion because we're checking that no overflow error occurs
+
