@@ -5,12 +5,13 @@ while also teaching software engineering principles.
 
 Blog posts:
 
-- https://jeremykun.com/2020/09/11/searching-for-rh-counterexamples-setting-up-pytest/
-- https://jeremykun.com/2020/09/11/searching-for-rh-counterexamples-adding-a-database/
-- https://jeremykun.com/2020/09/28/searching-for-rh-counterexamples-search-strategies/
-- https://jeremykun.com/2020/10/13/searching-for-rh-counterexamples-unbounded-integers/
-- https://jeremykun.com/2021/01/04/searching-for-rh-counterexamples-deploying-with-docker/
-- https://jeremykun.com/2021/02/02/searching-for-rh-counterexamples-performance-profiling/
+- [Setting up Pytest](https://jeremykun.com/2020/09/11/searching-for-rh-counterexamples-setting-up-pytest/)
+- [Adding a Database](https://jeremykun.com/2020/09/11/searching-for-rh-counterexamples-adding-a-database/)
+- [Search Strategies](https://jeremykun.com/2020/09/28/searching-for-rh-counterexamples-search-strategies/)
+- [Unbounded Integers](https://jeremykun.com/2020/10/13/searching-for-rh-counterexamples-unbounded-integers/)
+- [Deploying with Docker](https://jeremykun.com/2021/01/04/searching-for-rh-counterexamples-deploying-with-docker/)
+- [Performance Profiling](https://jeremykun.com/2021/02/02/searching-for-rh-counterexamples-performance-profiling/)
+- [Scaling Up](https://jeremykun.com/2021/02/16/searching-for-rh-counterexamples-scaling-up/)
 
 ## Development requirements
 
