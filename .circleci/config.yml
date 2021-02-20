@@ -20,6 +20,7 @@ jobs:
          command: |
               pip install -r requirements-dev.txt
               NUMBA_DISABLE_JIT=1 pytest --mypy --cov-report html:cov_html --cov-report annotate:cov_annotate --cov
+              coveralls $COVERALLS_REPO_TOKEN
 workflows:
   main:
     jobs:
