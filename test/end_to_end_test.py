@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 from multiprocessing import Pool
 from multiprocessing import Process
+from pytest_cov.embed import cleanup_on_sigterm
 from typing import List
 import pytest
 import testing.postgresql
@@ -19,6 +20,9 @@ from riemann.types import SearchBlockState
 from riemann.types import SearchIndex
 from riemann.types import SearchMetadata
 from riemann.types import SuperabundantEnumerationIndex
+
+
+cleanup_on_sigterm()
 
 
 @pytest.fixture
