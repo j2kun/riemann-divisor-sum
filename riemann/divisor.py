@@ -35,13 +35,11 @@ def witness_value(n: int, precomputed_divisor_sum=None) -> float:
 def compute_riemann_divisor_sums(start_n: int,
                                  end_n: int) -> List[RiemannDivisorSum]:
     '''Compute a batch of divisor sums.'''
-    output = [None] * (end_n - start_n + 1)
+    output = []
 
     for n in range(start_n, end_n + 1):
         ds = divisor_sum(n)
         wv = witness_value(n, precomputed_divisor_sum=ds)
-        output[n - start_n] = RiemannDivisorSum(n=n,
-                                                divisor_sum=ds,
-                                                witness_value=wv)
+        output.append(RiemannDivisorSum(n=n, divisor_sum=ds, witness_value=wv))
 
     return output
