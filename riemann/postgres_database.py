@@ -1,5 +1,4 @@
 from typing import List
-from typing import Union
 from dataclasses import replace
 
 import psycopg2.extras
@@ -126,8 +125,7 @@ class PostgresDivisorDb(DivisorDb):
 
         max_n, max_witness = cursor.fetchone()
         if max_n is None or max_witness is None:
-            return SummaryStats(largest_computed_n=None,
-                                largest_witness_value=None)
+            raise ValueError("No data!")
 
         cursor.execute('''
             SELECT
@@ -190,9 +188,7 @@ class PostgresDivisorDb(DivisorDb):
         self.connection.commit()
 
     def claim_next_search_block(
-        self,
-        search_index_type: str
-    ) -> Union[SearchMetadata, None]:
+            self, search_index_type: str) -> SearchMetadata:
         cursor = self.connection.cursor()
         # FOR UPDATE locks the row for the duration of the query.
         # Cf. https://stackoverflow.com/q/11532550/438830
