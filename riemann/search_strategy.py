@@ -104,7 +104,7 @@ class SuperabundantSearchStrategy(SearchStrategy):
     def __init__(self):
         self._search_index = SuperabundantEnumerationIndex(
             level=1, index_in_level=0)
-        self.current_level = [[1]]
+        self.current_level = CachedPartitionsOfN(1)
         self.__maybe_reset_current_level__()
         self._index_name = self._search_index.__class__.__name__
 
@@ -190,6 +190,6 @@ class SuperabundantSearchStrategy(SearchStrategy):
 
     def __maybe_reset_current_level__(self):
         '''Idempotently compute the next level of the enumeration.'''
-        if self.current_level[0] != self._search_index.level:
+        if self.current_level.n != self._search_index.level:
             self.current_level = CachedPartitionsOfN(
                 n=self._search_index.level)
