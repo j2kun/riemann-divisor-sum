@@ -108,7 +108,7 @@ def prime_factorization(draw):
     return list(zip(bases, powers))
 
 
-@settings(deadline=1000)
+@settings(deadline=10000)
 @given(prime_factorization())
 def test_prime_factor_divisor_sum(prime_factorization):
     n = reduce(lambda x, y: x * y, (p**a for (p, a) in prime_factorization))
