@@ -1,6 +1,7 @@
 '''
 A job that repeatedly looks for stale search blocks, and marks them as failed.
 '''
+
 from datetime import datetime
 from datetime import timedelta
 from typing import List
@@ -14,24 +15,23 @@ from riemann.types import SearchMetadata
 
 def get_stale_blocks(
         all_metadata: List[SearchMetadata],
-        staleness_duration: timedelta,
-        relative_time: datetime = None) -> List[SearchMetadata]:
+        staleness_duration: timedelta) -> List[SearchMetadata]:
     '''Return search blocks that are considered stale.'''
-    if not relative_time:
-        relative_time = datetime.now()
+    relative_time = datetime.now()
 
     return [
         block for block in all_metadata
         if (
-            block.state in [SearchBlockState.IN_PROGRESS]
+            block.start_time is not None
+            and block.state in [SearchBlockState.IN_PROGRESS]
             and relative_time - block.start_time > staleness_duration
         )
     ]
 
 
 def main(divisorDb: DivisorDb,
-         refresh_period_seconds: int = None,
-         staleness_duration: timedelta = None) -> None:
+         refresh_period_seconds: int,
+         staleness_duration: timedelta) -> None:
     while True:
         try:
             all_metadata = divisorDb.load_metadata()
