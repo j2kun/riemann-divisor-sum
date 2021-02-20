@@ -1,5 +1,7 @@
 # Divisor Sums for the Riemann Hypothesis
 
+[![CircleCI](https://circleci.com/gh/j2kun/riemann-divisor-sum.svg?style=shield)](https://circleci.com/gh/j2kun/riemann-divisor-sum)
+
 An application that glibly searches for RH counterexamples,
 while also teaching software engineering principles.
 
