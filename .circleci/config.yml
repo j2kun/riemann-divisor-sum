@@ -18,8 +18,8 @@ jobs:
       - run:
          name: "Run tests"
          command: |
-              pip install -r requirements.txt
-              pytest
+              pip install -r requirements-dev.txt
+              pytest --mypy
 workflows:
   main:
     jobs:
