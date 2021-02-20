@@ -52,6 +52,7 @@ def make_processor_test_strategy(process_block_fn):
 
         def process_block(self, block: SearchMetadata) -> List[RiemannDivisorSum]:
             process_block_fn()
+            raise Exception('Failing for a test!')
 
         def max(self, blocks: List[SearchIndex]) -> SearchIndex:
             raise Exception('Failing for a test!')
