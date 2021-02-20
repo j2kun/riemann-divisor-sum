@@ -5,6 +5,7 @@ from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
 from copy import deepcopy
+from typing import Generic
 from typing import Iterator
 from typing import List
 
@@ -15,33 +16,36 @@ from riemann.superabundant import partition_to_prime_factorization
 from riemann.types import ExhaustiveSearchIndex
 from riemann.types import RiemannDivisorSum
 from riemann.types import SearchIndex
+from riemann.types import SearchIndexT
 from riemann.types import SearchMetadata
 from riemann.types import SuperabundantEnumerationIndex
 
 
-class SearchStrategy(ABC):
+class SearchStrategy(ABC, Generic[SearchIndexT]):
     @abstractmethod
     def index_name(self) -> str:
         '''The name of the SearchIndex subclass used with this strategy.'''
         pass
 
     @abstractmethod
-    def starting_from(self, search_index: SearchIndex) -> SearchStrategy:
+    def starting_from(self, search_index: SearchIndexT) -> SearchStrategy:
         '''Reset the search strategy to search from a given state.'''
         pass
 
     @abstractmethod
-    def generate_search_blocks(self, count: int, batch_size: int) -> List[SearchMetadata]:
+    def generate_search_blocks(
+            self, count: int, batch_size: int) -> List[SearchMetadata[SearchIndexT]]:
         '''Generate new search blocks to process.'''
         pass
 
     @abstractmethod
-    def process_block(self, block: SearchMetadata) -> List[RiemannDivisorSum]:
+    def process_block(
+            self, block: SearchMetadata[SearchIndexT]) -> List[RiemannDivisorSum]:
         '''Compute the Riemann divisor sums for the given block.'''
         pass
 
     @abstractmethod
-    def max(self, blocks: List[SearchIndex]) -> SearchIndex:
+    def max(self, blocks: List[SearchIndexT]) -> SearchIndexT:
         '''
         Compute the "max" search block, according to the
         enumeration defined by the search strategy.
@@ -61,7 +65,7 @@ def search_strategy_by_name(strategy_name):
     return lookup[strategy_name]
 
 
-class ExhaustiveSearchStrategy(SearchStrategy):
+class ExhaustiveSearchStrategy(SearchStrategy[ExhaustiveSearchIndex]):
     '''A search strategy that tries every positive integer starting from 5041.'''
 
     def __init__(self):
@@ -77,7 +81,8 @@ class ExhaustiveSearchStrategy(SearchStrategy):
         self._search_index = search_index
         return self
 
-    def generate_search_blocks(self, count: int, batch_size: int) -> List[SearchMetadata]:
+    def generate_search_blocks(
+            self, count: int, batch_size: int) -> List[SearchMetadata[ExhaustiveSearchIndex]]:
         start = self._search_index.n
         blocks = []
         for i in range(count):
@@ -91,14 +96,17 @@ class ExhaustiveSearchStrategy(SearchStrategy):
             ))
         return blocks
 
-    def process_block(self, block: SearchMetadata) -> List[RiemannDivisorSum]:
-        return divisor.compute_riemann_divisor_sums(block.starting_search_index.n, block.ending_search_index.n)
+    def process_block(
+            self, block: SearchMetadata[ExhaustiveSearchIndex]) -> List[RiemannDivisorSum]:
+        return divisor.compute_riemann_divisor_sums(
+            block.starting_search_index.n, block.ending_search_index.n)
 
     def index_name(self) -> str:
         return self._index_name
 
 
-class SuperabundantSearchStrategy(SearchStrategy):
+class SuperabundantSearchStrategy(
+        SearchStrategy[SuperabundantEnumerationIndex]):
     '''A search strategy that iterates over possibly superabundant numbers.'''
 
     def __init__(self):
@@ -127,10 +135,11 @@ class SuperabundantSearchStrategy(SearchStrategy):
         self.__maybe_reset_current_level__()
         return self
 
-    def generate_search_blocks(self, count: int, batch_size: int) -> List[SearchMetadata]:
+    def generate_search_blocks(
+            self, count: int, batch_size: int) -> List[SearchMetadata[SuperabundantEnumerationIndex]]:
         return [self.generate_next_block(batch_size) for i in range(count)]
 
-    def generate_next_block(self, batch_size: int) -> SearchMetadata:
+    def generate_next_block(self, batch_size: int) -> SearchMetadata[SuperabundantEnumerationIndex]:
         starting_index = deepcopy(self._search_index)
 
         '''
@@ -164,7 +173,8 @@ class SuperabundantSearchStrategy(SearchStrategy):
             search_index_type='SuperabundantEnumerationIndex',
         )
 
-    def process_block(self, block: SearchMetadata) -> List[RiemannDivisorSum]:
+    def process_block(
+            self, block: SearchMetadata[SuperabundantEnumerationIndex]) -> List[RiemannDivisorSum]:
         sums = []
         current_index = block.starting_search_index
         ending_index = block.ending_search_index

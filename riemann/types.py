@@ -5,8 +5,10 @@ from dataclasses import field
 from datetime import datetime
 from enum import Enum
 from hashlib import sha256
+from typing import Generic
 from typing import List
 from typing import Tuple
+from typing import TypeVar
 from typing import Union
 
 PrimeFactorization = List[Tuple[int, int]]
@@ -35,6 +37,9 @@ class SearchIndex(ABC):
     @abstractmethod
     def serialize(self) -> str:
         pass
+
+
+SearchIndexT = TypeVar('SearchIndexT', bound=SearchIndex)
 
 
 @dataclass(frozen=True)
@@ -89,9 +94,9 @@ class SearchBlockState(Enum):
 
 
 @dataclass(frozen=True)
-class SearchMetadata:
-    starting_search_index: SearchIndex
-    ending_search_index: SearchIndex
+class SearchMetadata(Generic[SearchIndexT]):
+    starting_search_index: SearchIndexT
+    ending_search_index: SearchIndexT
     search_index_type: str = "SuperabundantEnumerationIndex"
     state: SearchBlockState = SearchBlockState.NOT_STARTED
     creation_time: datetime = field(default_factory=lambda: datetime.now())
