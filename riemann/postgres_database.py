@@ -189,9 +189,7 @@ class PostgresDivisorDb(DivisorDb):
         self.connection.commit()
 
     def claim_next_search_block(
-        self,
-        search_index_type: str
-    ) -> Union[SearchMetadata, None]:
+            self, search_index_type: str) -> SearchMetadata:
         cursor = self.connection.cursor()
         # FOR UPDATE locks the row for the duration of the query.
         # Cf. https://stackoverflow.com/q/11532550/438830
