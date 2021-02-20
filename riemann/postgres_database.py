@@ -1,5 +1,4 @@
 from typing import List
-from typing import Union
 from dataclasses import replace
 
 import psycopg2.extras
