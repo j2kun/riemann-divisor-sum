@@ -72,8 +72,7 @@ class InMemoryDivisorDb(DivisorDb):
 
     def summarize(self) -> SummaryStats:
         if not self.data:
-            return SummaryStats(largest_computed_n=None,
-                                largest_witness_value=None)
+            raise ValueError("No data!")
 
         largest_computed_n = max(self.data.values(), key=lambda x: x.n)
         largest_witness_value = max(self.data.values(),

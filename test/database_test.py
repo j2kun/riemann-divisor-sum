@@ -204,10 +204,8 @@ class TestDatabase:
         assert metadata.state == SearchBlockState.FAILED
 
     def test_summarize_empty(self, db):
-        expected = SummaryStats(largest_computed_n=None,
-                                largest_witness_value=None)
-
-        assert expected == db.summarize()
+        with pytest.raises(ValueError):
+            db.summarize()
 
     def test_summarize_nonempty(self, db):
         self.populate_search_blocks(db)

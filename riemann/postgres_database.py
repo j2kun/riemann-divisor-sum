@@ -126,8 +126,7 @@ class PostgresDivisorDb(DivisorDb):
 
         max_n, max_witness = cursor.fetchone()
         if max_n is None or max_witness is None:
-            return SummaryStats(largest_computed_n=None,
-                                largest_witness_value=None)
+            raise ValueError("No data!")
 
         cursor.execute('''
             SELECT
