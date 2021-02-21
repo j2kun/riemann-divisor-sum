@@ -1,0 +1,10 @@
+path_classifiers:
+  test: "test/*_test.py"
+extraction:
+  python:
+    prepare:
+      packages:
+        - libgmp3-dev
+        - libmpc-dev
+        - libmpfr-dev
+
