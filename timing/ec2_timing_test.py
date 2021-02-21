@@ -1,12 +1,7 @@
-from riemann import divisor
-from riemann import superabundant
-from riemann.search_strategy import SuperabundantSearchStrategy
-from riemann.superabundant import partition_to_prime_factorization
-from riemann.superabundant import partitions_of_n
 from riemann.postgres_database import PostgresDivisorDb
+from riemann.search_strategy import SuperabundantSearchStrategy
 from riemann.types import SuperabundantEnumerationIndex
 import cProfile
-import numba
 import time
 
 db = PostgresDivisorDb(data_source_name='')

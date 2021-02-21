@@ -9,7 +9,6 @@ from riemann.database import DivisorDb
 from riemann.postgres_database import PostgresDivisorDb
 from riemann.search_strategy import search_strategy_by_name
 from riemann.search_strategy import SearchStrategy
-from riemann.types import SearchMetadata
 
 
 def claim_and_compute_one_block(

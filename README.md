@@ -2,6 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/j2kun/riemann-divisor-sum.svg?style=shield)](https://circleci.com/gh/j2kun/riemann-divisor-sum)
 [![Coverage Status](https://coveralls.io/repos/github/j2kun/riemann-divisor-sum/badge.svg?branch=main)](https://coveralls.io/github/j2kun/riemann-divisor-sum?branch=main)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/j2kun/riemann-divisor-sum.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/j2kun/riemann-divisor-sum/context:python)
 
 An application that glibly searches for RH counterexamples,
 while also teaching software engineering principles.
