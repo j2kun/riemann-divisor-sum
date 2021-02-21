@@ -147,10 +147,6 @@ class PostgresDivisorDb(DivisorDb):
                             largest_witness_value=largest_witness_record)
 
     def insert_search_blocks(self, blocks: List[SearchMetadata]) -> None:
-        blocks_to_insert = [
-            replace(block, state=SearchBlockState.NOT_STARTED)
-            for block in blocks
-        ]
         cursor = self.connection.cursor()
         query = '''
         INSERT INTO
@@ -174,7 +170,7 @@ class PostgresDivisorDb(DivisorDb):
                 block.start_time,
                 block.end_time,
                 block.search_index_type,
-                block.state.name,
+                SearchBlockState.NOT_STARTED.name,
                 block.starting_search_index.serialize(),
                 block.ending_search_index.serialize(),
                 block.block_hash
