@@ -83,20 +83,12 @@ sudo make install
 
 ## Running the program
 
-```bash
-python -m riemann.populate_database --help
-usage: populate_database.py [-h] [--data_source_name DATA_SOURCE_NAME]
-                            [--search_strategy_name {ExhaustiveSearchStrategy,SuperabundantSearchStrategy}]
-                            [--batch_size BATCH_SIZE]
+Run some combination of the following three worker jobs
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --data_source_name DATA_SOURCE_NAME
-                        The psycopg data_source_name string
-  --search_strategy_name {ExhaustiveSearchStrategy,SuperabundantSearchStrategy}
-                        The search strategy name
-  --batch_size BATCH_SIZE
-                        The size of search batches
+```bash
+python -m riemann.generate_search_blocks
+python -m riemann.process_search_blocks
+python -m riemann.cleanup_stale_blocks
 ```
 
 ## Deploying with Docker
@@ -106,16 +98,14 @@ Running with docker removes the need to install postgres and dependencies.
 ### Locally
 
 ```bash
-docker build -t divisordb -f divisordb.Dockerfile .
-docker build -t divisorsearch -f divisorsearch.Dockerfile .
+docker build -t divisordb -f docker/divisordb.Dockerfile .
+docker build -t generate -f docker/generate_search_blocks.Dockerfile .
+docker build -t process -f docker/process_search_blocks.Dockerfile .
 
-docker run -d --name divisordb -p 5432:5432 divisordb:latest
-
-# The host address for the divisordb container is nested inside a json
-# `jq` is a CLI for stream processing json data.
-export PGHOST=$(docker network inspect bridge | jq -r '.[0].Containers[] | select(.Name=="divisordb") | .IPv4Address' | sed 's|/.*$||g')
-
-docker run -d --name divisorsearch --env PGHOST=$PGHOST divisorsearch:latest
+docker run -d --name divisordb -p 5432:5432 --memory="1G" divisordb:latest
+export PGHOST=$(docker inspect -f "{{ .NetworkSettings.IPAddress }}" divisordb)
+docker run -d --name generate --env PGHOST="$PGHOST" --memory="1G" generate:latest
+docker run -d --name process --env PGHOST="$PGHOST" --memory="1G" process:latest
 ```
 
 #### Manual inspection
