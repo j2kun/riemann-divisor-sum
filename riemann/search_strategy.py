@@ -15,7 +15,6 @@ from riemann.superabundant import CachedPartitionsOfN
 from riemann.superabundant import partition_to_prime_factorization
 from riemann.types import ExhaustiveSearchIndex
 from riemann.types import RiemannDivisorSum
-from riemann.types import SearchIndex
 from riemann.types import SearchIndexT
 from riemann.types import SearchMetadata
 from riemann.types import SuperabundantEnumerationIndex

@@ -1,5 +1,4 @@
 from functools import reduce
-from numba import jit
 from numba import njit
 from riemann.primes import primes
 from riemann.types import Partition
