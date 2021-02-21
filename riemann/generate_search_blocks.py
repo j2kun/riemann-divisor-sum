@@ -39,7 +39,7 @@ def get_starting_index(
         # last_index already has a divisor sum in the database.  we need to go
         # one step further, but the interface doesn't quite support it yet. So
         # we generate one more block of size one.
-        return search_strategy.generate_search_blocks(
+        return search_strategy.starting_from(last_index).generate_search_blocks(
             count=1, batch_size=1
         )[0].ending_search_index
 
