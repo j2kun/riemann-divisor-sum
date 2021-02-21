@@ -13,4 +13,4 @@ def test_search_success():
 
 
 def test_best_witness_million():
-    assert 10080 == best_witness(1000000, search_start=5041)
+    assert 10080 == best_witness(20000, search_start=5041)

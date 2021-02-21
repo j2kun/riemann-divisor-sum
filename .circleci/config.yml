@@ -19,7 +19,8 @@ jobs:
          name: "Run tests"
          command: |
               pip install -r requirements-dev.txt
-              pytest --mypy
+              NUMBA_DISABLE_JIT=1 pytest --mypy --cov-report html:cov_html --cov-report annotate:cov_annotate --cov
+              coveralls
 workflows:
   main:
     jobs:
