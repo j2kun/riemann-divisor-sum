@@ -15,3 +15,19 @@ sleep 5
 docker run -d --name generate --env PGHOST="$PGHOST" --memory="1G" generate:latest
 sleep 5
 docker run -d --name process --env PGHOST="$PGHOST" --memory="1G" process:latest
+
+
+# monitoring
+sudo apt-get install ssmtp
+
+cat > /etc/ssmtp/ssmtp.conf << EOF
+root=$GMAIL_APP_USER
+mailhub=smtp.gmail.com:465
+FromLineOverride=YES
+AuthUser=$GMAIL_APP_USER
+AuthPass=$GMAIL_APP_PASS
+TLS_CA_FILE=/etc/ssl/certs/ca-certificates.crt
+UseTLS=Yes
+rewriteDomain=gmail.com
+hostname=$(hostname).$(dnsdomainname)
+EOF
