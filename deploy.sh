@@ -18,7 +18,13 @@ docker run -d --name process --env PGHOST="$PGHOST" --memory="1G" process:latest
 
 
 # monitoring
+
+# need pip to install requirements to run alerting script
+sudo apt install python3-pip
+# need smtp to send alert emails
 sudo apt-get install ssmtp
+
+pip install -r alerts/requirements.txt
 
 sudo -E cat > /etc/ssmtp/ssmtp.conf << EOF
 root=$GMAIL_APP_USER
