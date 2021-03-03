@@ -20,20 +20,8 @@ docker run -d --name process --env PGHOST="$PGHOST" --memory="1G" process:latest
 # monitoring
 
 # need pip to install requirements to run alerting script
-sudo apt install python3-pip
 # need smtp to send alert emails
-sudo apt-get install ssmtp
-
-pip install -r alerts/requirements.txt
-
-sudo -E cat > /etc/ssmtp/ssmtp.conf << EOF
-root=$GMAIL_APP_USER
-mailhub=smtp.gmail.com:465
-FromLineOverride=YES
-AuthUser=$GMAIL_APP_USER
-AuthPass=$GMAIL_APP_PASS
-TLS_CA_FILE=/etc/ssl/certs/ca-certificates.crt
-UseTLS=Yes
-rewriteDomain=gmail.com
-hostname=$(hostname).$(dnsdomainname)
-EOF
+sudo apt install -y python3-pip ssmtp
+pip3 install -r alerts/requirements.txt
+sudo -E alerts/configure_ssmtp.sh
+nohup python3 -m alerts.monitor_docker &
