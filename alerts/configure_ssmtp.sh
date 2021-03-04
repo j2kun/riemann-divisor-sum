@@ -10,7 +10,6 @@ root=$GMAIL_APP_USER
 mailhub=smtp.gmail.com:465
 FromLineOverride=YES
 AuthUser=$GMAIL_APP_USER
-AuthPass=$GMAIL_APP_PASS
 TLS_CA_FILE=/etc/ssl/certs/ca-certificates.crt
 UseTLS=Yes
 rewriteDomain=gmail.com

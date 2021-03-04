@@ -46,8 +46,9 @@ if __name__ == "__main__":
 
     def sendmail(message: str) -> None:
         email_dest = os.environ['GMAIL_APP_USER']
+        email_pass = os.environ['GMAIL_APP_PASS']
         print(f"Sending message to {email_dest}: {message}")
-        subprocess.check_output(["ssmtp", email_dest], text=True, input=message)
+        subprocess.check_output(["ssmtp", "-ap", email_pass, email_dest], text=True, input=message)
 
     try:
         run(sendmail, subprocess_runner)
