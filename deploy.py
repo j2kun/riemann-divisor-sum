@@ -41,7 +41,9 @@ if __name__ == "__main__":
             Worker(
                 envvar='EC2_DIVISORDB',
                 container_name='divisordb',
-                docker_run_args='-p 5432:5432',
+                # this requires first time setup to run
+                #   docker volume create pgdata
+                docker_run_args='-p 5432:5432 -v pgdata:/var/lib/postgresql/data',
             ),
             Worker(
                 envvar='EC2_GENERATOR',
@@ -75,7 +77,7 @@ if __name__ == "__main__":
         # stop containers, remove old images, and build new images
         for w in reversed(workers):
            client = instances[w]
-           cmd = f'docker stop {w.container_name}; docker rm {w.container_name}; docker image prune -a -f'
+           cmd = f'docker stop {w.container_name}; docker rm {w.container_name}; docker image prune -f --filter "until=24h"'
            run(client, cmd)
 
            cmd = (
