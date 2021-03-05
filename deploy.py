@@ -75,7 +75,7 @@ if __name__ == "__main__":
         # stop containers, remove old images, and build new images
         for w in reversed(workers):
            client = instances[w]
-           cmd = f'docker stop {w.container_name}; docker image prune -a -f'
+           cmd = f'docker stop {w.container_name}; docker rm {w.container_name}; docker image prune -a -f'
            run(client, cmd)
 
            cmd = (
