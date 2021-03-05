@@ -45,7 +45,7 @@ if __name__ == "__main__":
             ),
             Worker(
                 envvar='EC2_GENERATOR',
-                container_name='generator',
+                container_name='generate',
                 docker_run_args=f'--env PGHOST="{pg_host}"',
             ),
             Worker(
@@ -55,12 +55,12 @@ if __name__ == "__main__":
             ),
             Worker(
                 envvar='EC2_PROCESSOR1',
-                container_name='processor',
+                container_name='process',
                 docker_run_args=f'--env PGHOST="{pg_host}"',
             ),
             Worker(
                 envvar='EC2_PROCESSOR2',
-                container_name='processor',
+                container_name='process',
                 docker_run_args=f'--env PGHOST="{pg_host}"',
             ),
         ]
