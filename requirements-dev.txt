@@ -26,6 +26,7 @@ mypy==0.800
 numba==0.51.2
 numpy==1.19.1
 packaging==20.4
+paramiko==2.7.2
 parso==0.8.1
 pexpect==4.8.0
 pg8000==1.16.6
