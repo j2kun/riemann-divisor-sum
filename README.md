@@ -16,6 +16,7 @@ Blog posts:
 - [Deploying with Docker](https://jeremykun.com/2021/01/04/searching-for-rh-counterexamples-deploying-with-docker/)
 - [Performance Profiling](https://jeremykun.com/2021/02/02/searching-for-rh-counterexamples-performance-profiling/)
 - [Scaling Up](https://jeremykun.com/2021/02/16/searching-for-rh-counterexamples-scaling-up/)
+- [Productionizing](https://jeremykun.com/2021/03/06/searching-for-rh-counterexamples-productionizing/)
 
 ## Development requirements
 
@@ -99,13 +100,18 @@ Running with docker removes the need to install postgres and dependencies.
 
 ```bash
 docker build -t divisordb -f docker/divisordb.Dockerfile .
-docker build -t generate -f docker/generate_search_blocks.Dockerfile .
-docker build -t process -f docker/process_search_blocks.Dockerfile .
+docker build -t generate -f docker/generate.Dockerfile .
+docker build -t process -f docker/process.Dockerfile .
+docker build -t cleanup -f docker/cleanup.Dockerfile .
 
-docker run -d --name divisordb -p 5432:5432 --memory="1G" divisordb:latest
+docker volume create pgdata
+
+docker run -d --name divisordb -p 5432:5432 -v pgdata:/var/lib/postgresql/data divisordb:latest
 export PGHOST=$(docker inspect -f "{{ .NetworkSettings.IPAddress }}" divisordb)
-docker run -d --name generate --env PGHOST="$PGHOST" --memory="1G" generate:latest
-docker run -d --name process --env PGHOST="$PGHOST" --memory="1G" process:latest
+
+docker run -d --name generate --env PGHOST="$PGHOST" generate:latest
+docker run -d --name cleanup --env PGHOST="$PGHOST" cleanup:latest
+docker run -d --name process --env PGHOST="$PGHOST" process:latest
 ```
 
 #### Manual inspection
@@ -143,5 +149,21 @@ sudo usermod -aG docker ubuntu
 # log out and log back in
 
 git clone https://github.com/j2kun/riemann-divisor-sum && cd riemann-divisor-sum
-bash deploy.sh
+```
+
+#### Updating existing EC2 deployment
+
+Fill out the environment variables from `.env.template` in `.env`,
+then run `python deploy.py`.
+
+This will only work if the application has been set up initially 
+(docker installed and the repository cloned).
+
+#### Running the monitoring script
+
+```bash
+sudo apt install -y python3-pip ssmtp
+pip3 install -r alerts/requirements.txt
+sudo -E alerts/configure_ssmtp.sh
+nohup python3 -m alerts.monitor_docker &
 ```
