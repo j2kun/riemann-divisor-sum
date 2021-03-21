@@ -13,7 +13,7 @@ from typing import TextIO
 
 def export_divisor_sums(divisorDb: DivisorDb, output_file: TextIO) -> None:
     # for now, use only 115 primes for columns
-    prime_subset = primes[:115]
+    prime_subset = list(primes[:115])
     prime_columns = ','.join(['%d' % p for p in prime_subset])
     output_file.write('log_n,witness_value,' + prime_columns + '\n')
     for rds in divisorDb.load():
