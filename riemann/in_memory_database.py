@@ -1,5 +1,6 @@
 '''A simple in-memory divisor database.'''
 from datetime import datetime
+from typing import Iterable
 from typing import List
 
 from dataclasses import replace
@@ -16,8 +17,8 @@ class InMemoryDivisorDb(DivisorDb):
         self.data = dict()
         self.metadata = dict()
 
-    def load(self) -> List[RiemannDivisorSum]:
-        return list(self.data.values())
+    def load(self) -> Iterable[RiemannDivisorSum]:
+        return self.data.values()
 
     def load_metadata(self) -> List[SearchMetadata]:
         return list(self.metadata.values())

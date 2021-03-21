@@ -1,6 +1,7 @@
 '''An interface for a database containing divisor sums.'''
 from abc import ABC
 from abc import abstractmethod
+from typing import Iterable
 from typing import List
 
 from riemann.types import RiemannDivisorSum
@@ -17,8 +18,13 @@ class DivisorDb(ABC):
         pass
 
     @abstractmethod
-    def load(self) -> List[RiemannDivisorSum]:
-        '''Load the entire database of Riemann divisor sums.'''
+    def load(self) -> Iterable[RiemannDivisorSum]:
+        '''
+        Load the entire database of Riemann divisor sums.
+
+        The result may return a streaming iterator depending on the
+        implementation.
+        '''
         pass
 
     @abstractmethod
