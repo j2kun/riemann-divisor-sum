@@ -58,7 +58,7 @@ class TestDatabase:
         db.insert_search_blocks(metadatas)
 
     def test_initially_empty(self, db):
-        assert len(db.load()) == 0
+        assert len(list(db.load())) == 0
         with pytest.raises(ValueError):
             db.claim_next_search_block(
                 search_index_type='ExhaustiveSearchIndex')
@@ -113,7 +113,7 @@ class TestDatabase:
         ]
 
         db.finish_search_block(block, records)
-        assert len(db.load()) > 0
+        assert len(list(db.load())) > 0
 
         next_block = db.claim_next_search_block(
             search_index_type='ExhaustiveSearchIndex')
@@ -155,7 +155,7 @@ class TestDatabase:
         ]
 
         db.finish_search_block(block, records)
-        stored = db.load()
+        stored = list(db.load())
         assert len(stored) == 1
         assert stored[0].n == 2
 
@@ -187,7 +187,7 @@ class TestDatabase:
         ]
 
         db.finish_search_block(block, records)
-        stored = db.load()
+        stored = list(db.load())
         assert len(stored) == 1
         assert stored[0].n == 2
 

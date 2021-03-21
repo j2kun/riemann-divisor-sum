@@ -103,7 +103,7 @@ def test_generate_and_process_blocks_no_duplicates(db_factory):
     metadatas = db.load_metadata()
     assert len(metadatas) > 0
 
-    divisor_sums = db.load()
+    divisor_sums = list(db.load())
     assert len(divisor_sums) > 0
 
     n_values = [d.n for d in divisor_sums]
@@ -157,7 +157,7 @@ def test_multiple_processors_no_duplicates(db_factory):
     for worker in workers:
         worker.close()
 
-    divisor_sums = db.load()
+    divisor_sums = list(db.load())
     assert len(divisor_sums) > 0
 
     n_values = [d.n for d in divisor_sums]

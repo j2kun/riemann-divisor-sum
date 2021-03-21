@@ -1,5 +1,6 @@
-from typing import List
 from dataclasses import replace
+from typing import Iterable
+from typing import List
 
 import psycopg2.extras
 from gmpy2 import mpz
@@ -86,14 +87,19 @@ class PostgresDivisorDb(DivisorDb):
             ) for row in rows
         ]
 
-    def load(self) -> List[RiemannDivisorSum]:
-        cursor = self.connection.cursor()
+    def load(self) -> Iterable[RiemannDivisorSum]:
+        cursor = self.connection.cursor("load_divisor_sums")
         cursor.execute('''
             SELECT n, divisor_sum, witness_value
             FROM RiemannDivisorSums
             ORDER BY n asc;
         ''')
-        return self.convert_records(cursor.fetchall())
+        for row in cursor:
+            yield RiemannDivisorSum(
+                n=mpz(row[0]),
+                divisor_sum=mpz(row[1]),
+                witness_value=row[2]
+            )
 
     def load_metadata(self) -> List[SearchMetadata]:
         cursor = self.connection.cursor()
