@@ -1,5 +1,6 @@
 from functools import reduce
 
+from gmpy2 import mpz
 from hypothesis import given
 from hypothesis import settings
 from riemann.divisor import divisor_sum
@@ -7,6 +8,7 @@ from riemann.primes import primes
 from riemann.superabundant import CachedPartitionsOfN
 from riemann.superabundant import compute_riemann_divisor_sum
 from riemann.superabundant import count_partitions_of_n
+from riemann.superabundant import factorize
 from riemann.superabundant import partition_to_prime_factorization
 from riemann.superabundant import partitions_of_n
 from riemann.superabundant import prime_factor_divisor_sum
@@ -114,6 +116,13 @@ def test_prime_factor_divisor_sum(prime_factorization):
     n = reduce(lambda x, y: x * y, (p**a for (p, a) in prime_factorization))
     print(n)
     assert prime_factor_divisor_sum(prime_factorization) == divisor_sum(n)
+
+
+@given(prime_factorization())
+def test_factorize(prime_factorization):
+    n = reduce(lambda x, y: x * y, (mpz(p)**a for (p, a) in prime_factorization))
+    primes = [x[0] for x in prime_factorization]
+    assert prime_factorization == factorize(n, primes)
 
 
 def test_prime_factor_divisor_sum_2():
