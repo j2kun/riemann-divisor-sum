@@ -1,7 +1,10 @@
+from collections import defaultdict
 from functools import reduce
+from typing import Dict
 from typing import List
 from typing import Tuple
 
+from gmpy2 import divexact
 from gmpy2 import log
 from gmpy2 import mpz
 from numba import njit
@@ -106,6 +109,16 @@ def count_partitions_of_n(n: int) -> int:
 def partition_to_prime_factorization(
         partition: Partition) -> PrimeFactorization:
     return [(primes[i], exp) for (i, exp) in enumerate(partition)]
+
+
+def factorize(n: mpz, primes: List[int]) -> PrimeFactorization:
+    assert n > 0
+    factorization: Dict[int, int] = defaultdict(int)
+    for p in primes:
+        while n % p == 0:
+            factorization[p] += 1
+            n = divexact(n, p)
+    return [(k, factorization[k]) for k in primes]
 
 
 def prime_factor_divisor_sum(prime_factors: PrimeFactorization) -> int:

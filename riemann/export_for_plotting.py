@@ -6,16 +6,22 @@ suitable for plotting.
 from gmpy2 import log
 from riemann.database import DivisorDb
 from riemann.postgres_database import PostgresDivisorDb
+from riemann.primes import primes
+from riemann.superabundant import factorize
 from typing import TextIO
 
 
-def main(divisorDb: DivisorDb, output_file: TextIO) -> None:
-    output_file.write('log_n,log_divisor_sum,witness_value\n')
+def export_divisor_sums(divisorDb: DivisorDb, output_file: TextIO) -> None:
+    # for now, use only 115 primes for columns
+    prime_subset = list(primes[:115])
+    prime_columns = ','.join(['%d' % p for p in prime_subset])
+    output_file.write('log_n,witness_value,' + prime_columns + '\n')
     for rds in divisorDb.load():
         log_n = log(rds.n)
-        log_divisor_sum = log(rds.divisor_sum)
+        factorization = factorize(rds.n, prime_subset)
+        factor_columns = ','.join(['%d' % d for (p, d) in factorization])
         output_file.write(
-            f'{log_n:.10f},{log_divisor_sum:.10f},{rds.witness_value:.10f}\n')
+            f'{log_n:.10f},{rds.witness_value:.10f},{factor_columns}\n')
 
 
 if __name__ == "__main__":
@@ -27,13 +33,13 @@ if __name__ == "__main__":
         help='The psycopg data_source_name string'
     )
     parser.add_argument(
-        '--output_file_path',
+        '--divisor_sums_filepath',
         type=str,
         default='divisor_sums.csv',
-        help='The filepath to write data to (default divisor_sums.csv)'
+        help='The filepath to write divisor sum witness values to (default divisor_sums.csv)'
     )
 
     args = parser.parse_args()
     db = PostgresDivisorDb(data_source_name=args.data_source_name)
-    with open('divisor_sums.csv', 'w') as outfile:
-        main(db, outfile)
+    with open(args.divisor_sums_filepath, 'w') as outfile:
+        export_divisor_sums(db, outfile)
