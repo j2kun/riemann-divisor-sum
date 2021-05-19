@@ -89,10 +89,10 @@ class PostgresDivisorDb(DivisorDb):
 
     def load(self) -> Iterable[RiemannDivisorSum]:
         cursor = self.connection.cursor("load_divisor_sums")
+        cursor.itersize = 1000000
         cursor.execute('''
             SELECT n, divisor_sum, witness_value
-            FROM RiemannDivisorSums
-            ORDER BY n asc;
+            FROM RiemannDivisorSums;
         ''')
         for row in cursor:
             yield RiemannDivisorSum(
