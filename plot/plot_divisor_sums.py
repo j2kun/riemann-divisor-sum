@@ -28,11 +28,10 @@ if __name__ == "__main__":
     df.select(df.log_n > 12.3, name='log_n_min')
     df.select(df.witness_value > 1.68, name='witness_value_min')
 
-    '''
     df.viz.heatmap(
         df.log_n, 
         df.witness_value, 
-        limits=['minmax', [1.68, 1.78]],
+        limits=['minmax', [1.68, 1.782]],
         selection=['witness_value_min', 'log_n_min'],
         colormap='coolwarm', 
         ylabel='witness_value',
@@ -40,29 +39,14 @@ if __name__ == "__main__":
         show=True
     )
     plt.clf()
-    '''
 
-    df['cumulative_max_witness_value'] = df.witness_value[:]
-    the_max = 0
-    i = 0
-    step = 1000000
-    while i < df.shape[0]:
-        print(i)
-        next_batch = df.witness_value.values[i:i+step]
-        maxes = numpy.zeros((step,))
-        for j, value in enumerate(next_batch):
-            the_max = max(the_max, value)
-            maxes[j] = the_max
-        i += step
-        df.cumulative_max_witness_value.values[i:i+step] = maxes
-
-    plt.scatter(
+    df.viz.scatter(
         df.log_n, 
         df.cumulative_max_witness_value, 
-        limits=['minmax', [1.68, 1.78]],
-        selection=['witness_value_min', 'log_n_min'],
+        ylabel='witness_value',
+        xlabel='$\log(n)$',
         c="red", 
         alpha=0.5, 
-        s=4
+        s=4,
     )
     plt.show()

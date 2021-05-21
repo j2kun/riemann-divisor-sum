@@ -167,3 +167,17 @@ pip3 install -r alerts/requirements.txt
 sudo -E alerts/configure_ssmtp.sh
 nohup python3 -m alerts.monitor_docker &
 ```
+
+## Exporting and plotting data
+
+```bash
+python -m riemann.export_for_plotting --data_source_name='dbname=divisor' --divisor_sums_filepath=divisor_sums.csv
+
+# sort the csv by log_n using gnu sort
+sort -t , -n -k 1 divisor_sums.csv -o divisor_sums_sorted.csv
+
+# convert to hdf5
+python -c "import vaex; vaex.from_csv('divisor_sums.csv', convert=True, chunk_size=5_000_000)"
+
+python -m plot.plot_divisor_sums --divisor_sums_hdf5_path=divisor_sums.hdf5
+```

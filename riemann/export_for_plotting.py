@@ -13,15 +13,15 @@ from typing import TextIO
 
 def export_divisor_sums(divisorDb: DivisorDb, output_file: TextIO) -> None:
     # for now, use only 115 primes for columns
-    prime_subset = list(primes[:115])
-    prime_columns = ','.join(['%d' % p for p in prime_subset])
-    output_file.write('log_n,witness_value,' + prime_columns + '\n')
+    # prime_subset = list(primes[:115])
+    # prime_columns = ','.join(['%d' % p for p in prime_subset])
+    output_file.write('log_n,witness_value\n')  # ,' + prime_columns + '\n')
     for rds in divisorDb.load():
         log_n = log(rds.n)
-        factorization = factorize(rds.n, prime_subset)
-        factor_columns = ','.join(['%d' % d for (p, d) in factorization])
+        # factorization = factorize(rds.n, prime_subset)
+        # factor_columns = ','.join(['%d' % d for (p, d) in factorization])
         output_file.write(
-            f'{log_n:.10f},{rds.witness_value:.10f},{factor_columns}\n')
+            f'{log_n:.10f},{rds.witness_value:.10f}\n')  # ,{factor_columns}\n')
 
 
 if __name__ == "__main__":
