@@ -28,9 +28,9 @@ if __name__ == "__main__":
     x, y = zip(*pts)
 
     if args.fit_log:
-        def func(x, a, b, c):
-            return a + b * np.log(x) + c * np.log(np.log(x))
-        guess = np.array([1, 1, 1])
+        def func(x, a, b):
+            return a + b * np.log(np.log(x))
+        guess = np.array([1, 1])
     else:
         def func(x, a, b):  # type: ignore
             return a + b / x
@@ -39,10 +39,12 @@ if __name__ == "__main__":
     params, cov = curve_fit(func, x, y, guess)
 
     if args.fit_log:
-        for x in range(300, 10000):
+        for x in range(600, 1000000):
             if func(x, *params) > 1.782:
                 print(x)
                 break
+        else:
+            print(f"Didn't find a passing value! Largest was {func(x, *params):.8f}")
     else:
         print(params[0])
 
