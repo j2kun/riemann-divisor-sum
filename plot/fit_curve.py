@@ -32,7 +32,7 @@ if __name__ == "__main__":
             return a + b * np.log(x) + c * np.log(np.log(x))
         guess = np.array([1, 1, 1])
     else:
-        def func(x, a, b):
+        def func(x, a, b):  # type: ignore
             return a + b / x
         guess = np.array([1, 1])
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
                 print(x)
                 break
     else:
-        print(params[1])
+        print(params[0])
 
     print(params)
     print(cov)
