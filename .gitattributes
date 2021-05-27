@@ -1,1 +1,2 @@
 divisordb-2021-04-28.gz filter=lfs diff=lfs merge=lfs -text
+data/divisor-sums-2021-04-28.csv filter=lfs diff=lfs merge=lfs -text
