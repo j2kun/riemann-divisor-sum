@@ -1,3 +1,4 @@
+bokeh==2.3.0
 scipy==1.6.2
 umap-learn==0.5.1
 vaex-astro==0.8.0
