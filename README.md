@@ -17,6 +17,7 @@ Blog posts:
 - [Performance Profiling](https://jeremykun.com/2021/02/02/searching-for-rh-counterexamples-performance-profiling/)
 - [Scaling Up](https://jeremykun.com/2021/02/16/searching-for-rh-counterexamples-scaling-up/)
 - [Productionizing](https://jeremykun.com/2021/03/06/searching-for-rh-counterexamples-productionizing/)
+- [Exploring data](https://jeremykun.com/2021/06/14/searching-for-rh-counterexamples-exploring-data/)
 
 ## Development requirements
 
