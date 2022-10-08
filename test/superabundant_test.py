@@ -9,7 +9,6 @@ from riemann.superabundant import CachedPartitionsOfN
 from riemann.superabundant import compute_riemann_divisor_sum
 from riemann.superabundant import count_partitions_of_n
 from riemann.superabundant import factorize
-from riemann.superabundant import partition_to_prime_factorization
 from riemann.superabundant import partitions_of_n
 from riemann.superabundant import prime_factor_divisor_sum
 import hypothesis.strategies as st
@@ -22,6 +21,11 @@ expected_partitions = [
     list(enumerate([[4], [3, 1], [2, 2], [2, 1, 1], [1, 1, 1, 1]])),
     list(enumerate([[5], [4, 1], [3, 2], [3, 1, 1], [
          2, 2, 1], [2, 1, 1, 1], [1, 1, 1, 1, 1]])),
+    list(enumerate([
+        [6], [5, 1], [4, 2], [4, 1, 1], [3, 3], [3, 2, 1],
+        [3, 1, 1, 1],  [2, 2, 2],  [2, 2, 1, 1], [2, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1]
+    ])),
 ]
 
 partition_pairs = zip(
@@ -43,6 +47,14 @@ partition_count_pairs = zip(
 @pytest.mark.parametrize("test_input,expected", partition_pairs)
 def test_partitions_of_n(test_input, expected):
     assert partitions_of_n(test_input) == expected
+
+
+@given(
+    st.integers(min_value=7, max_value=50),
+)
+def test_partitions_of_n_sums_to_n(n):
+    for _, partition in partitions_of_n(n=n):
+        assert sum(partition) == n
 
 
 @pytest.mark.parametrize("test_input,expected", partition_count_pairs)
