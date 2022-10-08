@@ -7,8 +7,6 @@ __pycache__
 
 # Ignore files cached by Hypothesis...
 .hypothesis/*
-# except for the examples directory
-!.hypothesis/examples/
 
 .coverage
 cov_*
