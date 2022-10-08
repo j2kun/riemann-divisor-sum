@@ -49,6 +49,7 @@ def test_partitions_of_n(test_input, expected):
     assert partitions_of_n(test_input) == expected
 
 
+@settings(deadline=10000)
 @given(
     st.integers(min_value=7, max_value=50),
 )
