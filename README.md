@@ -33,6 +33,12 @@ On Mac OS X these can be installed via brew as follows
 brew install gmp mpfr libmpc postgresql
 ```
 
+Or using `apt`
+
+```
+apt install -y libgmp3-dev libmpfr-dev libmpc-dev postgresql-12
+```
+
 Then, in a virtualenv,
 
 ```
@@ -157,7 +163,7 @@ git clone https://github.com/j2kun/riemann-divisor-sum && cd riemann-divisor-sum
 Fill out the environment variables from `.env.template` in `.env`,
 then run `python deploy.py`.
 
-This will only work if the application has been set up initially 
+This will only work if the application has been set up initially
 (docker installed and the repository cloned).
 
 #### Running the monitoring script

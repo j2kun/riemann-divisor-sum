@@ -60,8 +60,14 @@ def partitions_of_n(
             # partition is all 1s
             break
 
-        p[k] -= 1
+        # At this step, we're "gathering up" all the ones to the right of k,
+        # and starting the redistribution process over. This means that all
+        # the ones to the right of k need to be reset to zero.
         amount_to_split = right_of_non_one + 1
+        p[k] -= 1
+        for index_to_clear in range(k + 1, len(p)):
+            p[index_to_clear] = 0
+
         while amount_to_split > p[k]:
             p[k + 1] = p[k]
             amount_to_split -= p[k]
